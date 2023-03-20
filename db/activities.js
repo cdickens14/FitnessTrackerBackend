@@ -2,7 +2,7 @@ const client = require('./client');
 
 // database functions
 async function createActivity({ name, description }) {
-  // return the new activity
+  // return the new activity- new comment
 }
 
 async function getAllActivities() {
