@@ -3,19 +3,30 @@ const client = require("./client");
 // database functions
 
 // user functions
-async function createUser({ username, password }) {
-  
+const createUser = async({ username, password }) => {
+  const { rows } = await client.query(`
+    INSERT INTO users(username, password)
+    VALUES ($1, $2)
+    ON CONFLICT (username) DO NOTHING
+    RETURNING *;
+    `, [username, password]);
+    
 }
 
-async function getUser({ username, password }) {
+const getUser = async({ username, password }) => {
+  const { rows } = await client.query(`
+    SELECT *
+    FROM users
+    
+  `)
 
 }
 
-async function getUserById(userId) {
+const getUserById = async(userId) => {
 
 }
 
-async function getUserByUsername(userName) {
+const getUserByUsername = async(userName)=> {
 
 }
 
