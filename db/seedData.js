@@ -2,14 +2,16 @@
 // const { } = require('./');
 const client = require("./client")
 const { createUser } = require('./users.js');
-const { createActivity } = require('./activities.js');
-const { createRoutine } = require('./routines.js');
+const { createActivity, getAllActivities } = require('./activities.js');
+const { createRoutine, getRoutinesWithoutActivities } = require('./routines.js');
+const { addActivityToRoutine } = require('./routine_activities.js');
 
 async function dropTables() {
   console.log("Dropping All Tables...")
   // drop all tables, in the correct order
   try {
       await client.query(`
+      DROP TABLE IF EXISTS routine_activities;
       DROP TABLE IF EXISTS routines;
       DROP TABLE IF EXISTS activities;
       DROP TABLE IF EXISTS users;
@@ -43,6 +45,14 @@ async function createTables() {
         "isPublic" BOOLEAN DEFAULT false,
         name VARCHAR(255) UNIQUE NOT NULL,
         goal TEXT NOT NULL
+      );
+
+      CREATE TABLE routine_activities(
+        id SERIAL PRIMARY KEY,
+        "routineId" INTEGER REFERENCES routines(id),
+        "activityId" INTEGER REFERENCES activities(id),
+        duration INTEGER,
+        count INTEGER
       );
     `);
 
