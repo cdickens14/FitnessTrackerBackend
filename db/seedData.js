@@ -3,10 +3,21 @@
 const client = require("./client")
 const { createUser } = require('./users.js');
 const { createActivity } = require('./activities.js');
+const { createRoutine } = require('./routines.js');
 
 async function dropTables() {
   console.log("Dropping All Tables...")
   // drop all tables, in the correct order
+  try {
+      await client.query(`
+      DROP TABLE IF EXISTS routines;
+      DROP TABLE IF EXISTS activities;
+      DROP TABLE IF EXISTS users;
+      `)
+
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function createTables() {
@@ -24,6 +35,14 @@ async function createTables() {
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) UNIQUE NOT NULL,
         description VARCHAR(255) NOT NULL
+      );
+
+      CREATE TABLE routines(
+        id SERIAL PRIMARY KEY,
+        "creatorId" INTEGER REFERENCES users(id),
+        "isPublic" BOOLEAN DEFAULT false,
+        name VARCHAR(255) UNIQUE NOT NULL,
+        goal TEXT NOT NULL
       );
     `);
 
