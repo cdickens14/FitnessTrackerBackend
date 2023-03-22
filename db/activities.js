@@ -3,13 +3,17 @@ const client = require("./client");
 // database functions
 const createActivity = async({ name, description }) => {
   // return the new activity
-  const { rows } = await client.query(`
+  try {
+    const { rows } = await client.query(`
     INSERT INTO activities(name, description)
     VALUES ($1, $2)
     RETURNING *;
-  `, [name, description])
+  `, [name, description]);
 
-  return rows;
+  return rows[0];
+} catch (err) {
+  console.log(err);
+}
 }
 
 const getAllActivities = async() => {
@@ -30,9 +34,9 @@ const getActivityById = async(id) => {
     const { rows } = await client.query(`
       SELECT *
       FROM activities
-      WHERE id=${id}
-    `);
-    return rows;
+      WHERE id=$1
+    `, [id]);
+    return rows[0];
   } catch(err) {
     console.log(err);
   }
@@ -43,9 +47,9 @@ const getActivityByName = async(name) => {
     const { rows } = await client.query(`
       SELECT *
       FROM activities
-      WHERE name=${name}
-    `);
-    return rows;
+      WHERE name=$1
+    `, [name]);
+    return rows[0];
   } catch(err) {
     console.log(err);
   }

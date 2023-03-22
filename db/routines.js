@@ -7,18 +7,30 @@ const createRoutine = async({ creatorId, isPublic, name, goal }) => {
       VALUES ($1, $2, $3, $4)
       RETURNING *;
     `, [creatorId, isPublic, name, goal])
+    return rows[0];
   } catch(err) {
     console.log(err);
   }
 }
 
-async function getRoutineById(id) {}
+const getRoutineById = async(id) => {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM routines
+      WHERE id=$1;
+    `, [id]);
+    return rows[0];
+    } catch (err) {
+    console.log(err);
+  }
+}
 
 const getRoutinesWithoutActivities = async() => {
   try {
     const { rows } = await client.query(`
       SELECT *
-      FROM routines
+      FROM routines;
     `)
     return rows;
   } catch(err) {
@@ -26,19 +38,65 @@ const getRoutinesWithoutActivities = async() => {
   }
 }
 
-async function getAllRoutines() {}
+const getAllRoutines = async() => {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM routines;
+    `)
+    return rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-async function getAllPublicRoutines() {}
+const getAllPublicRoutines = async() => {
+  try {
 
-async function getAllRoutinesByUser({ username }) {}
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-async function getPublicRoutinesByUser({ username }) {}
+const getAllRoutinesByUser = async({ username }) => {
+  try {
 
-async function getPublicRoutinesByActivity({ id }) {}
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-async function updateRoutine({ id, ...fields }) {}
+const getPublicRoutinesByUser= async({ username }) => {
+  try {
 
-async function destroyRoutine(id) {}
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const getPublicRoutinesByActivity = async({ id }) => {
+  try {
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const updateRoutine = async({ id, ...fields }) => {
+  try {
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const destroyRoutine = async (id) => {
+  try {
+
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 module.exports = {
   getRoutineById,
