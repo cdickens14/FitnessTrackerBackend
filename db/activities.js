@@ -25,17 +25,58 @@ const getAllActivities = async() => {
   }
 }
 
-const getActivityById = async(id) => {}
+const getActivityById = async(id) => {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM activities
+      WHERE id=${id}
+    `);
+    return rows;
+  } catch(err) {
+    console.log(err);
+  }
+}
 
-const getActivityByName = async(name) => {}
-
+const getActivityByName = async(name) => {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM activities
+      WHERE name=${name}
+    `);
+    return rows;
+  } catch(err) {
+    console.log(err);
+  }
+}
+  
 // used as a helper inside db/routines.js
-const attachActivitiesToRoutines = async(routines) => {}
+const attachActivitiesToRoutines = async(routines) => {
+  try {
+    const { rows } = await client.query(`
+      
+    `)
+  } catch(err) {
+    console.log(err);
+  }
+}
 
 const updateActivity = async({ id, ...fields }) => {
   // don't try to update the id
   // do update the name and description
   // return the updated activity
+  try {
+    const { rows } = await client.query(`
+      UPDATE activities
+      SET name = ${fields}
+      description = ${fields}
+      RETURNING *
+    `);
+    return rows;
+  } catch(err) {
+    console.log(err);
+  }
 }
 
 module.exports = {
