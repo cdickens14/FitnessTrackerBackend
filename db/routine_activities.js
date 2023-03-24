@@ -18,15 +18,25 @@ const addActivityToRoutine = async({
   }
 }
 
-async function getRoutineActivityById(id) {}
+const getRoutineActivityById = async(id) => {
 
-async function getRoutineActivitiesByRoutine({ id }) {}
+}
 
-async function updateRoutineActivity({ id, ...fields }) {}
+const getRoutineActivitiesByRoutine = async({ id }) => {
 
-async function destroyRoutineActivity(id) {}
+}
 
-async function canEditRoutineActivity(routineActivityId, userId) {}
+const updateRoutineActivity = async({ id, ...fields }) => {
+
+}
+
+const destroyRoutineActivity = async (id) => {
+
+}
+
+const canEditRoutineActivity = async(routineActivityId, userId) => {
+  
+}
 
 module.exports = {
   getRoutineActivityById,

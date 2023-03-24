@@ -43,7 +43,7 @@ const getAllRoutines = async() => {
     const { rows } = await client.query(`
       SELECT *
       FROM routines;
-    `)
+      `)
     return rows;
   } catch (err) {
     console.log(err);
@@ -52,7 +52,12 @@ const getAllRoutines = async() => {
 
 const getAllPublicRoutines = async() => {
   try {
-
+    const { rows } = await client.query(`
+      SELECT *
+      FROM routines
+      WHERE "isPublic" = true;
+    `)
+    return rows;
   } catch (err) {
     console.log(err);
   }
@@ -60,7 +65,11 @@ const getAllPublicRoutines = async() => {
 
 const getAllRoutinesByUser = async({ username }) => {
   try {
-
+    const { rows } = await client.query(`
+      SELECT *
+      FROM routines
+      ;
+    `)
   } catch (err) {
     console.log(err);
   }
