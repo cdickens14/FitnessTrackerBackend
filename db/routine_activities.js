@@ -18,15 +18,15 @@ const addActivityToRoutine = async({
   }
 }
 
-const getRoutineActivityById = async(id) => {
+const getRoutineActivityById = async (id) => {
 
 }
 
-const getRoutineActivitiesByRoutine = async({ id }) => {
+const getRoutineActivitiesByRoutine = async ({ id }) => {
 
 }
 
-const updateRoutineActivity = async({ id, ...fields }) => {
+const updateRoutineActivity = async ({ id, ...fields }) => {
 
 }
 
@@ -34,7 +34,7 @@ const destroyRoutineActivity = async (id) => {
 
 }
 
-const canEditRoutineActivity = async(routineActivityId, userId) => {
+const canEditRoutineActivity = async (routineActivityId, userId) => {
   
 }
 

@@ -1,6 +1,8 @@
 const client = require("./client");
+const { getUserByUsername }= require('./users.js');
+const { addActivityToRoutine } = require('./routine_activities.js');
 
-const createRoutine = async({ creatorId, isPublic, name, goal }) => {
+const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
   try {
     const { rows } = await client.query(`
       INSERT INTO routines("creatorId", "isPublic", name, goal)
@@ -13,7 +15,7 @@ const createRoutine = async({ creatorId, isPublic, name, goal }) => {
   }
 }
 
-const getRoutineById = async(id) => {
+const getRoutineById = async (id) => {
   try {
     const { rows } = await client.query(`
       SELECT *
@@ -26,7 +28,7 @@ const getRoutineById = async(id) => {
   }
 }
 
-const getRoutinesWithoutActivities = async() => {
+const getRoutinesWithoutActivities = async () => {
   try {
     const { rows } = await client.query(`
       SELECT *
@@ -38,19 +40,20 @@ const getRoutinesWithoutActivities = async() => {
   }
 }
 
-const getAllRoutines = async() => {
+const getAllRoutines = async (routines) => {
   try {
-    const { rows } = await client.query(`
+    const routine = await addActivityToRoutine(routines);
+    const { rows }= await client.query(`
       SELECT *
       FROM routines;
       `)
-    return rows;
+    return routine;
   } catch (err) {
     console.log(err);
   }
 }
 
-const getAllPublicRoutines = async() => {
+const getAllPublicRoutines = async () => {
   try {
     const { rows } = await client.query(`
       SELECT *
@@ -63,19 +66,40 @@ const getAllPublicRoutines = async() => {
   }
 }
 
-const getAllRoutinesByUser = async({ username }) => {
+const getAllRoutinesByUser = async ({ username }) => {
   try {
+    const user = await getUserByUsername(username);
+     const {
+       rows: [routines],
+     } = await client.query(
+       `
+       SELECT routines.*, users.username AS "creatorName"
+       FROM routines
+       JOIN users ON routines."creatorId" = users.id
+       WHERE creatorId = $1
+     `,
+       [user.id]
+     );
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const getPublicRoutinesByUser = async ({ username }) => {
+  try {
+    const user = await getUserByUsername(username);
     const { rows } = await client.query(`
       SELECT *
       FROM routines
-      ;
-    `)
+      WHERE "isPublic" = true;
+    `);
+
   } catch (err) {
     console.log(err);
   }
 }
 
-const getPublicRoutinesByUser= async({ username }) => {
+const getPublicRoutinesByActivity = async ({ id }) => {
   try {
 
   } catch (err) {
@@ -83,15 +107,7 @@ const getPublicRoutinesByUser= async({ username }) => {
   }
 }
 
-const getPublicRoutinesByActivity = async({ id }) => {
-  try {
-
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-const updateRoutine = async({ id, ...fields }) => {
+const updateRoutine = async ({ id, ...fields }) => {
   try {
 
   } catch (err) {
@@ -101,7 +117,11 @@ const updateRoutine = async({ id, ...fields }) => {
 
 const destroyRoutine = async (id) => {
   try {
-
+    const { rows } = await client.query(`
+      DELETE id
+      FROM routines
+      WHERE id=$1;
+    `, [id]);
   } catch (err) {
     console.log(err);
   }

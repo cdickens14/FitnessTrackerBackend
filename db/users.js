@@ -3,7 +3,7 @@ const client = require("./client");
 // database functions
 
 // user functions
-const createUser = async({ username, password }) => {
+const createUser = async ({ username, password }) => {
   try {
     const { rows } = await client.query(`
     INSERT INTO users(username, password)
@@ -18,7 +18,7 @@ const createUser = async({ username, password }) => {
 }
 }
 //*****need to verify password from user against hashed password
-const getUser = async({ username, password }) => {
+const getUser = async ({ username, password }) => {
   try {
     const { rows } = await client.query(`
     SELECT *
@@ -32,7 +32,7 @@ const getUser = async({ username, password }) => {
   }
 }
 
-const getUserById = async(userId) => {
+const getUserById = async (userId) => {
   try {
     const { rows } = await client.query(`
       SELECT *
@@ -47,7 +47,7 @@ const getUserById = async(userId) => {
   }
 }
 
-const getUserByUsername = async(userName)=> {
+const getUserByUsername = async (userName)=> {
   try {
     const { rows: [user] } = await client.query(`
       SELECT *

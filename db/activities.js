@@ -1,7 +1,7 @@
 const client = require("./client");
 
 // database functions
-const createActivity = async({ name, description }) => {
+const createActivity = async ({ name, description }) => {
   // return the new activity
   try {
     const { rows } = await client.query(`
@@ -16,7 +16,7 @@ const createActivity = async({ name, description }) => {
 }
 }
 
-const getAllActivities = async() => {
+const getAllActivities = async () => {
   // select and return an array of all activities
   try {
     const { rows } = await client.query(`
@@ -29,7 +29,7 @@ const getAllActivities = async() => {
   }
 }
 
-const getActivityById = async(id) => {
+const getActivityById = async (id) => {
   try {
     const { rows } = await client.query(`
       SELECT *
@@ -42,7 +42,7 @@ const getActivityById = async(id) => {
   }
 }
 
-const getActivityByName = async(name) => {
+const getActivityByName = async (name) => {
   try {
     const { rows } = await client.query(`
       SELECT *
@@ -56,17 +56,20 @@ const getActivityByName = async(name) => {
 }
   
 // used as a helper inside db/routines.js
-const attachActivitiesToRoutines = async(routines) => {
+const attachActivitiesToRoutines = async (routines) => {
   try {
-    const { rows } = await client.query(`
-      
-    `)
-  } catch(err) {
+    const { rows: [activities] } = await client.query(`
+      SELECT *
+      FROM activities
+      JOIN routine_activities ON routine_activities."activityid" = activities.id
+      WHERE 
+    `);
+  } catch (err) {
     console.log(err);
   }
 }
 
-const updateActivity = async({ id, ...fields }) => {
+const updateActivity = async ({ id, ...fields }) => {
   // don't try to update the id
   // do update the name and description
   // return the updated activity
@@ -74,7 +77,7 @@ const updateActivity = async({ id, ...fields }) => {
     const { rows } = await client.query(`
       UPDATE activities
       SET name = ${fields}
-      description = ${fields}
+      SET description = ${fields}
       RETURNING *
     `);
     return rows;
