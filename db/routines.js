@@ -89,7 +89,7 @@ const getPublicRoutinesByUser = async ({ username }) => {
   try {
     const user = await getUserByUsername(username);
     const { rows } = await client.query(`
-      SELECT *
+      SELECT routines.*, users.username
       FROM routines
       WHERE "isPublic" = true;
     `);
