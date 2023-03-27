@@ -66,36 +66,57 @@ const getActivityByName = async (name) => {
 
 // used as a helper inside db/routines.js
 const attachActivitiesToRoutines = async (routines) => {
+  console.log();
   // incomplete function
   // doug suggested that we map over routines
   try {
-    const {
-      rows: [activities],
-    } = await client.query(`
+    // get an individual routine by looping through routines
+    for (let i = 0; i < routines.length; i++) {
+      // select activities that have a corresponding routine ID from database
+      const routine = routines[i];
+      console.log(routine);
+      const {
+        rows: [activities],
+      } = await client.query(`
       SELECT *
       FROM activities
-      JOIN routine_activities ON routine_activities."activityid" = activities.id
-      WHERE 
+      JOIN routine_activities ON activities.id = routine_activities.activity_id
+      WHERE routine_activities.routine_id = routine.id
     `);
+      // routine.activities =
+    }
   } catch (err) {
     console.log(err);
   }
 };
 
 const updateActivity = async ({ id, ...fields }) => {
-  // don't try to update the id
-  // do update the name and description
-  // return the updated activity
+  // build the set string
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+
+  // return early if this is called without fields
+  if (setString.length === 0) {
+    return;
+  }
+
   try {
-    const { rows } = await client.query(`
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
       UPDATE activities
-      SET name = ${fields}
-      description = ${fields}
-      RETURNING *
-    `);
-    return rows;
-  } catch (err) {
-    console.log(err);
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;
+    `,
+      Object.values(fields)
+    );
+
+    return activity;
+  } catch (error) {
+    throw error;
   }
 };
 

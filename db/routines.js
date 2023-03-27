@@ -1,5 +1,7 @@
 const client = require("./client");
+const { addActivityToRoutine } = require("./routine_activities");
 const { getUserByUsername } = require("./users");
+const { attachActivitiesToRoutines } = require("./activities");
 
 const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
   try {
@@ -56,7 +58,8 @@ const getAllRoutines = async () => {
       SELECT *
       FROM routines;
     `);
-    return routines;
+    const routinesWithActivities = await attachActivitiesToRoutines(routines);
+    return routinesWithActivities;
   } catch (err) {
     console.log(err);
   }
@@ -79,7 +82,10 @@ const getAllRoutinesByUser = async ({ username }) => {
       SELECT routines.*, users.username AS "creatorName"
       FROM routines
       JOIN users ON routines."creatorId" = users.id
-      WHERE creatorId = $1
+      WHERE creatorId = $1;
+      SELECT *
+      FROM activities
+      JOIN routine_activities ON activities.id = routine_activities.id
     `,
       [user.id]
     );
@@ -103,14 +109,45 @@ const getPublicRoutinesByActivity = async ({ id }) => {
 };
 
 const updateRoutine = async ({ id, ...fields }) => {
+  // build the set string
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+
+  // return early if this is called without fields
+  if (setString.length === 0) {
+    return;
+  }
+
   try {
-  } catch (err) {
-    console.log(err);
+    const {
+      rows: [routine],
+    } = await client.query(
+      `
+      UPDATE routines
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;
+    `,
+      Object.values(fields)
+    );
+
+    return routine;
+  } catch (error) {
+    throw error;
   }
 };
 
 const destroyRoutine = async (id) => {
   try {
+    const {
+      rows: [routine],
+    } = await client.query(
+      `DELETE FROM routines
+      WHERE id = $1;`,
+      [id]
+    );
+    return routine;
   } catch (err) {
     console.log(err);
   }
