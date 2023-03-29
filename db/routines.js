@@ -1,7 +1,8 @@
+
 const client = require("./client");
-const { addActivityToRoutine } = require("./routine_activities");
+//const { addActivityToRoutine } = require("./routine_activities");
 const { getUserByUsername } = require("./users");
-//const { attachActivitiesToRoutines } = require("./activities");
+const { attachActivitiesToRoutines } = require("./activities");
 
 const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
   try {
@@ -23,7 +24,7 @@ const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
 
 const getRoutineById = async (id) => {
   try {
-    const { rows } = await client.query(
+    const { rows: [routine] } = await client.query(
       `
       SELECT *
       FROM routines
@@ -31,7 +32,7 @@ const getRoutineById = async (id) => {
     `,
       [id]
     );
-    return rows[0];
+    return routine;
   } catch (err) {
     console.log(err);
   }
@@ -55,14 +56,13 @@ const getAllRoutines = async () => {
       rows: [routines]
     } = await client.query(
       `
-      SELECT *
-      FROM activities
-      JOIN routine_activities ON activities.id = routine_activities.activity_id
-      WHERE routine_activities.routine_id = ${routines.id};
+      SELECT routines.*, users.username AS "creatorName"
+      FROM routines
+      JOIN users ON routines."creatorId" = users.id
+      
       `
     );
- routines.id = await addActivityToRoutine(routines);
-   return routines.activities;
+   return attachActivitiesToRoutines(routines);
     } catch (err) {
     console.log(err);
   }
@@ -115,15 +115,18 @@ const getAllPublicRoutines = async () => {
 
 const getPublicRoutinesByUser = async ({ username }) => {
   try {
-    const { rows: [user] } = await client.query(
+    const user = getUserByUsername(username)
+    const { rows: [routines] } = await client.query(
       `
-      SELECT *
-      FROM users
-      WHERE username = $1 AND "isPublic"=true;
+      SELECT routines.*, users.username AS creatorName
+      FROM routines
+      JOIN users ON routines."creatorId" = users.id
+      WHERE "creatorId" = $1 AND "isPublic"=true;
       `,
-      [username]
+      [user.id]
     )
-    return user;
+    console.log(user)
+    return attachActivitiesToRoutines(routines);
   } catch (err) {
     console.log(err);
   }

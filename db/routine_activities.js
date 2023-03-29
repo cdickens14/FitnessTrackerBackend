@@ -7,15 +7,17 @@ const addActivityToRoutine = async ({
   duration,
 }) => {
   try {
-    const { rows } = await client.query(
+    const { rows: [routineActivity] } = await client.query(
       `
       INSERT INTO routine_activities("routineId", "activityId", count, duration)
       VALUES($1, $2, $3, $4)
+      ON CONFLICT ("activityId", "routineId") DO NOTHING
       RETURNING *;
     `,
       [routineId, activityId, count, duration]
     );
-    return rows[0];
+    console.log(routineActivity)
+    return routineActivity;
   } catch (err) {
     console.log(err);
   }
@@ -101,7 +103,13 @@ const destroyRoutineActivity = async (id) => {
 
 const canEditRoutineActivity = async (routineActivityId, userId) => {
   try {
-    
+    const { rows: [routineActivity]} = await client.query(
+      `
+      SELECT *
+      FROM routines
+      WHERE creator_id = {userId};
+      `
+    )
   } catch (err) {
     console.log(err);
   }

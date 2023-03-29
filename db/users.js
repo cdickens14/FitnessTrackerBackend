@@ -1,32 +1,42 @@
 const client = require("./client");
+const bcrypt = require("bcrypt");
+const SALT_COUNT = 10;
 
 // database functions
 
 // user functions
 const createUser = async ({ username, password }) => {
+  const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
-    const { rows } = await client.query(`
+    const { rows: [user] } = await client.query(`
     INSERT INTO users(username, password)
     VALUES ($1, $2)
     ON CONFLICT (username) DO NOTHING
-    RETURNING *;
-    `, [username, password]);
-    delete rows[0].password;
-    return rows[0];
+    RETURNING id, username;
+    `, [username, hashedPassword]);
+    //delete user.password;
+    return user;
 } catch (err) {
   console.log(err);
 }
 }
 //*****need to verify password from user against hashed password
 const getUser = async ({ username, password }) => {
+  if (!username || !password) {
+    return;
+  }
   try {
-    const { rows } = await client.query(`
-    SELECT *
-    FROM users
-    WHERE username=$1
-  `, [username]);
-  delete rows[0].password;
-  return rows[0];
+    const user = await getUserByUsername(username);
+    if (!user) {
+      return;
+    }
+    const hashedPassword = user.password;
+    const matchPassword = await bcrypt.compare(password, hashedPassword);
+    if (!matchPassword) {
+      return;
+    }
+    delete user.password;
+    return user;
   } catch(err) {
     console.log(err);
   }
@@ -34,14 +44,14 @@ const getUser = async ({ username, password }) => {
 
 const getUserById = async (userId) => {
   try {
-    const { rows } = await client.query(`
+    const { rows: [user] } = await client.query(`
       SELECT *
       FROM users
       WHERE id=$1
     `, [userId]);
     //does line 37 delete password from DB?
-    delete rows[0].password;
-    return rows[0];
+    delete user.password;
+    return user;
   } catch(err) {
     console.log(err);
   }
@@ -54,6 +64,7 @@ const getUserByUsername = async (userName)=> {
       FROM users
       WHERE username=$1
     `, [userName]);
+    // delete user.password;
     return user;
   } catch(err) {
     console.log(err);
