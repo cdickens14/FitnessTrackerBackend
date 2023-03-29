@@ -3,3 +3,13 @@ node_modules/
 .idea
 .env
 coverage/
+tests/db/activities.spec.js
+db/routine_activities.spec.js
+db/routines.spec.js
+db/users.spec.js
+api/404.spec.js
+api/activities.spec.js
+api/health.spec.js
+api/routine_activities.spec.js
+api/routines.spec.js
+api/users.spec.js

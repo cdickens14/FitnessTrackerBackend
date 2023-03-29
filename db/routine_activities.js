@@ -7,31 +7,61 @@ const addActivityToRoutine = async ({
   duration,
 }) => {
   try {
-    const { rows } = await client.query(
+    const { rows: [routineActivity] } = await client.query(
       `
       INSERT INTO routine_activities("routineId", "activityId", count, duration)
       VALUES($1, $2, $3, $4)
+      ON CONFLICT ("activityId", "routineId") DO NOTHING
       RETURNING *;
     `,
       [routineId, activityId, count, duration]
     );
-    return rows[0];
+    console.log(routineActivity)
+    return routineActivity;
   } catch (err) {
     console.log(err);
   }
 };
 
-const getRoutineActivityById = async (id) => {};
+const getRoutineActivityById = async (id) => {
+  try {
+    const { rows: [routineActivity] } = await client.query(
+      `
+      SELECT *
+      FROM routine_activities
+      WHERE id =$1;
+      `,
+      [id]
+    )
+    return routineActivity;
+  } catch (err) {
+    console.log(err);
+  }
+  
+};
 
-const getRoutineActivitiesByRoutine = async ({ id }) => {};
+const getRoutineActivitiesByRoutine = async ({ id }) => {
+  try {
+    const { rows: [routineActivity]} = await client.query(
+      `
+      SELECT *
+      FROM routine_activities
+      WHERE routine_id=$1;
+      `,
+      [id]
+    )
+    return routineActivity;
+  } catch (err) {
+    console.log(err);
+  }
+  
+};
 
 const updateRoutineActivity = async ({ id, ...fields }) => {
-  // build the set string
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
     .join(", ");
 
-  // return early if this is called without fields
   if (setString.length === 0) {
     return;
   }
@@ -51,7 +81,7 @@ const updateRoutineActivity = async ({ id, ...fields }) => {
 
     return routineActivity;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 };
 const destroyRoutineActivity = async (id) => {
@@ -59,17 +89,31 @@ const destroyRoutineActivity = async (id) => {
     const {
       rows: [routineActivity],
     } = await client.query(
-      `DELETE FROM routine_activities
-      WHERE id = $1`,
+      `
+      DELETE FROM routine_activities
+      WHERE id = $1
+      `,
       [id]
     );
-    return routineActivity;
+    return routineActivity[0];
   } catch (err) {
     console.log(err);
   }
 };
 
-async function canEditRoutineActivity(routineActivityId, userId) {}
+const canEditRoutineActivity = async (routineActivityId, userId) => {
+  try {
+    const { rows: [routineActivity]} = await client.query(
+      `
+      SELECT *
+      FROM routines
+      WHERE creator_id = {userId};
+      `
+    )
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 module.exports = {
   getRoutineActivityById,

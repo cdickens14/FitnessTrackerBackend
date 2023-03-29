@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const { getAllActivities } = require("../db/activities.js");
+// const { getUserByUsername, createUser } = require('../db/users.js');
 
 // GET /api/health
 router.get("/health", async (req, res, next) => {});
@@ -7,10 +9,7 @@ router.get("/health", async (req, res, next) => {});
 // ROUTER: /api/users
 const usersRouter = require("./users");
 router.use("/users", usersRouter);
-router.post("/users/register", async (req, res, next) => {
-  const user = await createUser();
-  res.send(user);
-});
+
 // ROUTER: /api/activities
 const activitiesRouter = require("./activities");
 router.use("/activities", activitiesRouter);
