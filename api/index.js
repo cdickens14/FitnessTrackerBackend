@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getAllActivities, getActivityById, createActivity } = require('../db/activities.js');
 const { createUser } = require('../db/users.js');
-const { getAllRoutines, createRoutine, getRoutineById } = require('../db/routines.js');
+const { getAllRoutines, createRoutine, getRoutineById, getAllRoutinesByUser } = require('../db/routines.js');
 
 // GET /api/health
 router.get('/health', async (req, res, next) => {
@@ -23,6 +23,17 @@ router.post('/register', async(req, res, next) => {
     }
     next();
     
+});
+
+router.get('/me', async (req, res, next) => {
+    try {
+        const users = await getAllRoutinesByUser();
+        res.send(users);
+    } catch (err) {
+      console.log (err);
+    } 
+    next();
+
 });
 // router.post('/users/register', async (req, res, next) => {
 //     const { username, password } = req.body;

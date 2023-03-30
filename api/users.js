@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { getUserByUsername, createUser } = require('../db/users.js');
+const { getAllRoutinesByUser } = require('../db/routines.js');
 
 router.use((req, res, next) => {
     console.log("A request is being made to /users");
@@ -36,15 +37,20 @@ router.post('/users/register', async (req, res, next) => {
 // POST /api/users/login
 
 // GET /api/users/me
-router.get('/users/me', async (req, res, next) => {
+router.get('/me', async (req, res, next) => {
     try {
-        
-        
+        const users = await getAllRoutinesByUser();
+        res.send(users);
     } catch (err) {
-      next (err);
+      console.log (err);
     } 
+    next();
 
 });
 // GET /api/users/:username/routines
+router.get('/:username/routines', async (req, res, next) => {
+    const userRoutines = await 
+})
+
 
 module.exports = router;
