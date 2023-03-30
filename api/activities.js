@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllActivities, createActivity } = require('../db/activities.js');
+const { getAllActivities, createActivity, getActivityById } = require('../db/activities.js');
 
 router.use((req, res, next) => {
     console.log("A request is being made to /activities");
@@ -8,6 +8,15 @@ router.use((req, res, next) => {
 });
 
 // GET /api/activities/:activityId/routines
+router.get('/:activityId/routines', async (req, res, next) => {
+    try {
+        const activity = await getActivityById(req.params.activityId);
+        res.send(activity);
+    } catch (err) {
+        console.log(err);
+    }
+   next();
+});
 
 // GET /api/activities
 router.get('/activities', async (req, res, next) => {
