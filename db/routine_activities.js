@@ -7,16 +7,17 @@ const addActivityToRoutine = async ({
   duration,
 }) => {
   try {
-    const { rows: [routineActivity] } = await client.query(
+    const {
+      rows: [routineActivity],
+    } = await client.query(
       `
       INSERT INTO routine_activities("routineId", "activityId", count, duration)
       VALUES($1, $2, $3, $4)
-      ON CONFLICT ("activityId", "routineId") DO NOTHING
       RETURNING *;
     `,
       [routineId, activityId, count, duration]
     );
-    console.log(routineActivity)
+    // console.log(routineActivity);
     return routineActivity;
   } catch (err) {
     console.log(err);
@@ -25,36 +26,38 @@ const addActivityToRoutine = async ({
 
 const getRoutineActivityById = async (id) => {
   try {
-    const { rows: [routineActivity] } = await client.query(
+    const {
+      rows: [routineActivity],
+    } = await client.query(
       `
       SELECT *
       FROM routine_activities
       WHERE id =$1;
       `,
       [id]
-    )
+    );
     return routineActivity;
   } catch (err) {
     console.log(err);
   }
-  
 };
 
 const getRoutineActivitiesByRoutine = async ({ id }) => {
   try {
-    const { rows: [routineActivity]} = await client.query(
+    const {
+      rows: [routineActivity],
+    } = await client.query(
       `
       SELECT *
       FROM routine_activities
       WHERE routine_id=$1;
       `,
       [id]
-    )
+    );
     return routineActivity;
   } catch (err) {
     console.log(err);
   }
-  
 };
 
 const updateRoutineActivity = async ({ id, ...fields }) => {
@@ -103,17 +106,19 @@ const destroyRoutineActivity = async (id) => {
 
 const canEditRoutineActivity = async (routineActivityId, userId) => {
   try {
-    const { rows: [routineActivity]} = await client.query(
+    const {
+      rows: [routineActivity],
+    } = await client.query(
       `
       SELECT *
       FROM routines
       WHERE creator_id = {userId};
       `
-    )
+    );
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 module.exports = {
   getRoutineActivityById,
