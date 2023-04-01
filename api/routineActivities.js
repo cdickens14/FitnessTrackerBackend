@@ -2,6 +2,10 @@ const express = require('express');
 const routineActivitiesRouter = express.Router();
 const { destroyRoutineActivity, getRoutineActivityById, updateRoutineActivity } = require('../db/routine_activities.js');
 
+routineActivitiesRouter.use((req, res, next) => {
+  console.log("A request is being made to /routine_activities");
+  next();
+});
 // PATCH /api/routine_activities/:routineActivityId
 routineActivitiesRouter.patch('/:routineActivityId', async (req, res, next) => {
   const { routineActivityId } = req.params;

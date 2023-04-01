@@ -4,6 +4,11 @@ const { attachActivitiesToRoutines } = require('../db/activities.js');
 const { getAllRoutines, createRoutine, getRoutineById, updateRoutine, destroyRoutine }= require('../db/routines.js');
 const { requireUser} = require('./utils');
 
+routinesRouter.use((req, res, next) => {
+  console.log("A request is being made to /routines");
+  next();
+});
+
 // GET /api/routines
 routinesRouter.get('/', async (req, res, next) => {
     try {
