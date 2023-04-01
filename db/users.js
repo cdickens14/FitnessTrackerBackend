@@ -14,13 +14,12 @@ const createUser = async ({ username, password }) => {
     ON CONFLICT (username) DO NOTHING
     RETURNING id, username;
     `, [username, hashedPassword]);
-    //delete user.password;
     return user;
 } catch (err) {
   console.log(err);
 }
 }
-//*****need to verify password from user against hashed password
+
 const getUser = async ({ username, password }) => {
   if (!username || !password) {
     return;

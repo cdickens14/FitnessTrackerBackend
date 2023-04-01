@@ -63,7 +63,7 @@ const getActivityByName = async (name) => {
 }
 
 // used as a helper inside db/routines.js
-async function attachActivitiesToRoutines(routines) {
+const attachActivitiesToRoutines = async (routines) => {
   // no side effects
   const routinesToReturn = [...routines];
   const binds = routines.map((_, index) => `$${index + 1}`).join(', ');
@@ -91,28 +91,6 @@ async function attachActivitiesToRoutines(routines) {
     console.log (error);
   }
 }
-
- 
-  // try {
-  //   // get an individual routine by looping through routines
-  //   for (let i = 0; i < routines.length; i++) {
-  //     // select activities that have a corresponding routine ID from database
-  //     const routine = routines[i];
-  //     const {
-  //       rows: [activities],
-  //     } = await client.query(
-  //     `
-  //     SELECT *
-  //     FROM activities
-  //     JOIN routine_activities ON activities.id = routine_activities.activity_id
-  //     WHERE routine_activities.routine_id = ${routine.id}
-  //   `);
-  //   }
-  // } catch (err) {
-  //   console.log(err);
-  // }
-
-
 const updateActivity = async ({ id, ...fields }) => {
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)

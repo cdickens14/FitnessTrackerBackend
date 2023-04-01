@@ -1,25 +1,25 @@
 require("dotenv").config()
 const express = require("express");
 const app = express();
+const morgan = require('morgan');
+app.use(morgan('dev'));
+app.use(express.json());
 
 // Setup your Middleware and API Router here
-const apiPath = require('./api/index.js');
-app.use('/api', apiPath);
+const apiRouter = require('./api/index.js');
+app.use('/api', apiRouter);
 
-const requireUser = (req, res, next) => {
-    if (!req.user) {
-        next({
-            name: "MissingUserError",
-            message: "You must be logged in to perform this action"
-        });
-    }
-    next();
-}
-
-app.use('*', (req, res, next) => {
+apiRouter.use('*', (req, res, next) => {
     res.status(404);
-    res.send({ error: 'Route not found'});
-    next();
+    res.send({ error: 'route not found' });
 });
 
-module.exports = app, requireUser
+// apiRouter.use((error, req, res, next) => {
+//     res.send({
+//       name: error.name,
+//       message: error.message
+//     });
+//     next();
+//   });
+
+module.exports = app

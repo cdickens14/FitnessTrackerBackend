@@ -1,7 +1,7 @@
 const client = require("./client");
-// const { addActivityToRoutine } = require("./routine_activities");
 const { getUserByUsername } = require("./users");
 const { attachActivitiesToRoutines, getActivityById } = require("./activities");
+
 
 const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
   try {
@@ -97,7 +97,7 @@ const getPublicRoutinesByActivity = async ({ id }) => {
       JOIN users ON routines."creatorId" = users.id
       WHERE ${id} = $1 AND "isPublic" = true
       `,
-      [activity.id]
+      [id]
     );
     return attachActivitiesToRoutines(routines);
   } catch (err) {
@@ -131,7 +131,6 @@ const getPublicRoutinesByUser = async ({ username }) => {
       WHERE "isPublic"=true;
       `
     );
-    // console.log(user);
     return attachActivitiesToRoutines(routines);
   } catch (err) {
     console.log(err);
@@ -169,7 +168,7 @@ const updateRoutine = async ({ id, ...fields }) => {
 const destroyRoutine = async (id) => {
   try {
     const {
-      rows: [routine],
+      rows: routine,
     } = await client.query(
       `
       DELETE FROM routines
@@ -177,7 +176,7 @@ const destroyRoutine = async (id) => {
       `,
       [id]
     );
-    return routine[0];
+    return routine;
   } catch (err) {
     console.log(err);
   }

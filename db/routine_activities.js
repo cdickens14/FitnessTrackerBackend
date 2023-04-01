@@ -1,4 +1,5 @@
 const client = require("./client");
+const { getAllRoutinesByUser } = require("./routines");
 
 const addActivityToRoutine = async ({
   routineId,
@@ -17,7 +18,6 @@ const addActivityToRoutine = async ({
     `,
       [routineId, activityId, count, duration]
     );
-    // console.log(routineActivity);
     return routineActivity;
   } catch (err) {
     console.log(err);
@@ -90,7 +90,7 @@ const updateRoutineActivity = async ({ id, ...fields }) => {
 const destroyRoutineActivity = async (id) => {
   try {
     const {
-      rows: [routineActivity],
+      rows: routineActivity,
     } = await client.query(
       `
       DELETE FROM routine_activities
@@ -98,7 +98,7 @@ const destroyRoutineActivity = async (id) => {
       `,
       [id]
     );
-    return routineActivity[0];
+    delete routineActivity[0];
   } catch (err) {
     console.log(err);
   }
@@ -106,15 +106,21 @@ const destroyRoutineActivity = async (id) => {
 
 const canEditRoutineActivity = async (routineActivityId, userId) => {
   try {
+    const routineActivity = await getAllRoutinesByUser(userId);
     const {
-      rows: [routineActivity],
+      rows
     } = await client.query(
       `
       SELECT *
       FROM routines
-      WHERE creator_id = {userId};
+      WHERE "creatorId" = ${userId} AND "routineId" = ${routineActivityId};
       `
     );
+    if (!userId) {
+      return false;
+    } else {
+      return true;
+    }
   } catch (err) {
     console.log(err);
   }

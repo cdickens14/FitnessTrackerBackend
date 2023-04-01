@@ -1,18 +1,51 @@
 const express = require('express');
-const router = express.Router();
-const { destroyRoutineActivity } = require('../db/routine_activities.js');
+const routineActivitiesRouter = express.Router();
+const { destroyRoutineActivity, getRoutineActivityById, updateRoutineActivity } = require('../db/routine_activities.js');
 
 // PATCH /api/routine_activities/:routineActivityId
+routineActivitiesRouter.patch('/:routineActivityId', async (req, res, next) => {
+  const { routineActivityId } = req.params;
+    const { routineId, activityId, duration, count } = req.body;
 
-// DELETE /api/routine_activities/:routineActivityId
-router.delete('/:routineActivityId', async (req, res, next) => {
-    try {
-        const routineActivityId = await destroyRoutineActivity(req.params.routineActivityId);
-        res.send(routineActivityId);
-    } catch (err) {
-      console.log(err);
+    const updateFields = {};
+
+    if(routineId) {
+      updateFields.routineId = routineId;
     }
-    next();
+
+    if(activityId) {
+      updateFields.activityId = activityId;
+    }
+
+    if(duration) {
+      updateFields.duration = duration;
+    }
+     if (count) {
+      updateFields.count = count;
+     }
+
+    try {
+      const originalRoutineActivity = await getRoutineActivityById(req.params);
+
+      if (originalRoutineActivity.routineActivityId === routineActivityId) {
+        const updatedRoutineActivity = await updateRoutineActivity(routineActivityId, updateFields)
+        res.send(updatedRoutineActivity);
+      }
+    } catch ({ name, message }) {
+      next ({ name, message });
+  }
+  
 });
 
-module.exports = router;
+// DELETE /api/routine_activities/:routineActivityId
+routineActivitiesRouter.delete('/:routineActivityId', async (req, res, next) => {
+  const { routineActivityId } = req.params;
+    try {
+        const routineActivityId = await destroyRoutineActivity(req.params);
+        res.send(routineActivityId);
+    } catch ({ name, message }) {
+      next ({ name, message });
+    }
+});
+
+module.exports = routineActivitiesRouter;

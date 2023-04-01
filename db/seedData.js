@@ -2,11 +2,8 @@
 // const { } = require('./');
 const client = require("./client");
 const { createUser } = require("./users.js");
-const { createActivity, getAllActivities } = require("./activities.js");
-const {
-  createRoutine,
-  getRoutinesWithoutActivities,
-} = require("./routines.js");
+const { createActivity, getAllActivities  } = require("./activities.js");
+const {createRoutine, getRoutinesWithoutActivities, } = require("./routines.js");
 const { addActivityToRoutine } = require("./routine_activities.js");
 
 async function dropTables() {
@@ -55,7 +52,7 @@ async function createTables() {
         "activityId" INTEGER REFERENCES activities(id),
         duration INTEGER,
         count INTEGER,
-        UNIQUE ("routineId", "activityId")
+        UNIQUE ("activityId", "routineId")
       );
     `);
   } catch (err) {

@@ -1,49 +1,82 @@
 const express = require('express');
-const router = express.Router();
-const { getAllRoutines, createRoutine, getRoutineById, destroyRoutine }= require('../db/routines.js');
+const routinesRouter = express.Router();
+const { attachActivitiesToRoutines } = require('../db/activities.js');
+const { getAllRoutines, createRoutine, getRoutineById, updateRoutine, destroyRoutine }= require('../db/routines.js');
+const { requireUser} = require('./utils');
 
 // GET /api/routines
-router.get('/', async (req, res, next) => {
+routinesRouter.get('/', async (req, res, next) => {
     try {
         const routines = await getAllRoutines();
-    res.send(routines);
+        res.send(routines);
     } catch (err) {
-      console.log(err);
+      next(err);
     }
-    next();
 });
 // POST /api/routines
-router.post('/routines', async (req, res, next) => {
+routinesRouter.post('/', requireUser, async (req, res, next) => {
+  const { creatorId, isPublic, name, goal } = req.body;
     try {
         const routines = await createRoutine(req.body);
         res.send(routines);
-    } catch (err) {
-      console.log(err);
+    } catch ({ name, message }) {
+      next ({ name, message });
     }
-    next();
 });
 
 // PATCH /api/routines/:routineId
+routinesRouter.patch('/:routineId', async (req, res, next) => {
+  const { routineId } = req.params;
+    const { isPublic, name, goal } = req.body;
 
-// DELETE /api/routines/:routineId
-router.delete('/:routineId', async (req, res, next) => {
-    try {
-        const routineId = await destroyRoutine(req.params.routineId);
-        res.send(routineId);
-    } catch (err) {
-      console.log(err);
+    const updateFields = {};
+
+    if(isPublic === false) {
+      updateFields.isPublic = true;
+    } else {
+      updateFields.isPublic = false;
     }
-    next();
-})
-// POST /api/routines/:routineId/activities
-router.post('/:routineId/activities', async (req, res, next) => {
-    try {
-        const routineId = await getRoutineById(req.params.routineId);
-    res.send(routineId);
-    } catch (err) {
-      console.log(err);
+
+    if(name) {
+      updateFields.name = name;
     }
-    next();
+
+    if(goal) {
+      updateFields.goal = goal;
+    }
+
+    try {
+      const originalRoutine = await getRoutineById(req.params);
+
+      if (originalRoutine.routineId === routineId) {
+        const updatedRoutine = await updateRoutine(routineId, updateFields)
+        res.send(updatedRoutine);
+      }
+    } catch ({ name, message }) {
+      next ({ name, message });
+  }
+  
 });
 
-module.exports = router;
+
+// DELETE /api/routines/:routineId
+routinesRouter.delete('/:routineId', async (req, res, next) => {
+  const { routineId } = req.params;
+    try {
+        const _routineId = await destroyRoutine(req.params);
+        res.send(_routineId);
+    } catch ({ name, message }) {
+      next ({ name, message });
+    }
+})
+// POST /api/routines/:routineId/activities
+routinesRouter.post('/:routineId/activities', async (req, res, next) => {
+    try {
+        const routineId = await attachActivitiesToRoutines(req.params.routineId);
+        res.send(routineId);
+    } catch (err) {
+      next (err);
+    }
+});
+
+module.exports = routinesRouter;
