@@ -14,12 +14,12 @@ apiRouter.use('*', (req, res, next) => {
     res.send({ error: 'route not found' });
 });
 
-// apiRouter.use((error, req, res, next) => {
-//     res.send({
-//       name: error.name,
-//       message: error.message
-//     });
-//     next();
-//   });
+apiRouter.use((error, req, res, next) => {
+    res.send({
+      name: error.name,
+      message: error.message
+    });
+
+});
 
 module.exports = app

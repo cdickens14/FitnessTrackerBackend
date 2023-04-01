@@ -23,15 +23,4 @@ apiRouter.use('/routines', routinesRouter);
 const routineActivitiesRouter = require("./routineActivities");
 apiRouter.use("/routine_activities", routineActivitiesRouter);
 
-// apiRouter.use('*', (req, res, next) => {
-//   res.status(404);
-//   res.send({ error: 'route not found' });
-// });
-
-apiRouter.use((error, req, res, next) => {
-  res.send({ 
-    name: error.name,
-    message: error.message
-  });
-});
 module.exports = apiRouter;

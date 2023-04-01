@@ -20,7 +20,7 @@ activitiesRouter.get('/:activityId/routines', async (req, res, next) => {
         message: 'An activity with that name already exisits'});
         }
         const activity = getAllPublicRoutines(req.params)
-        res.send(activity);
+        res.send({activity});
     } catch ({ name, message }) {
       next ({ name, message });
     }
