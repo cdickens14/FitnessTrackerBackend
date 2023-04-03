@@ -89,13 +89,14 @@ const getAllRoutinesByUser = async ({ username }) => {
 
 const getPublicRoutinesByActivity = async ({ id }) => {
   try {
-    const activity = getActivityById(id);
+    // const activity = getActivityById(id);
     const { rows: routines } = await client.query(
       `
       SELECT routines.*, users.username AS "creatorName"
       FROM routines
       JOIN users ON routines."creatorId" = users.id
-      WHERE ${id} = $1 AND "isPublic" = true
+      JOIN routine_activities ON routine_activities."routineId" = routines.id
+      WHERE routine_activities."activityId" = $1 AND "isPublic" = true
       `,
       [id]
     );

@@ -3,12 +3,15 @@ const express = require("express");
 const app = express();
 const morgan = require('morgan');
 const path = require('path');
+const cors = require('cors');
 app.use(morgan('dev'));
 app.use(express.json());
 
 // Setup your Middleware and API Router here
 const apiRouter = require('./api/index.js');
 app.use('/api', apiRouter);
+
+app.use(cors());
 
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 
@@ -22,6 +25,7 @@ app.use('*', (req, res, next) => {
 app.use((error, req, res, next) => {
     res.send({
       name: error.name,
+      error: error.name,
       message: error.message
     });
 

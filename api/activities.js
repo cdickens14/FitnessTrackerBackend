@@ -1,7 +1,7 @@
 const express = require('express');
 const activitiesRouter = express.Router();
 const { getAllActivities, createActivity, updateActivity, getActivityById, getActivityByName } = require('../db/activities.js');
-const { getAllPublicRoutines } = require('../db/routines');
+const { getPublicRoutinesByActivity } = require('../db/routines');
 
 activitiesRouter.use((req, res, next) => {
     console.log("A request is being made to /activities");
@@ -10,19 +10,25 @@ activitiesRouter.use((req, res, next) => {
 
 // GET /api/activities/:activityId/routines
 activitiesRouter.get('/:activityId/routines', async (req, res, next) => {
-  const { name, description } = req.body;
   const { activityId } = req.params;
     try {
-        const _activity = await getActivityByName(name);
-        if(_activity) {
-        next ({ 
-        name: 'ActivityAlreadyExists',
-        message: 'An activity with that name already exisits'});
-        }
-        const activity = getAllPublicRoutines(req.params)
-        res.send({activity});
-    } catch ({ name, message }) {
-      next ({ name, message });
+        const activity = await getPublicRoutinesByActivity({id:activityId})
+       
+        // const _activity = await getActivityById(req.params);
+        if(activity) {
+          res.send(activity);
+        } else {
+          console.log("ERROR")
+          next ({ 
+            error: 'ActivityAlreadyExists',
+            name: 'ActivityAlreadyExists',
+            message: `Activity ${activityId} not found`
+          })
+        } 
+         
+        
+    } catch (err) {
+      next (err);
     }
 });
 
@@ -31,8 +37,8 @@ activitiesRouter.get('/', async (req, res, next) => {
     try {
         const activities = await getAllActivities();
         res.send(activities);
-    } catch ({ name, message }) {
-      next ({ name, message });
+    } catch (err) {
+      next (err);
     }
 });
 // POST /api/activities
@@ -41,14 +47,15 @@ activitiesRouter.post('/', async (req, res, next) => {
     try {
         const _activity = await getActivityByName(name);
         if(_activity) {
-        next({
-          name: 'ActivityAlreadyExists',
-          message: 'Activity already exists!'
-        });
+          next({
+            name: 'ActivityAlreadyExists',
+            error: 'ActivityAlreadyExists',
+            message: `An activity with name ${name} already exists`
+          });
+        } else {
+          const activity = await createActivity(req.body);
+          res.send(activity);
         }
-        
-        const activity = await createActivity(req.body);
-        res.send(activity);
     } catch (err) {
       next (err);
     }
@@ -72,14 +79,30 @@ activitiesRouter.patch('/:activityId', async (req, res, next) => {
     try {
       const originalActivity = await getActivityById(req.params);
 
-      if (originalActivity.activityId === activityId) {
-        const updatedActivity = await updateActivity(activityId, updateFields)
-        res.send(updatedActivity);
+      if (!originalActivity) {
+        next({
+          name: 'ActivityDoesNotExist',
+          error: 'ActivityDoesNotExist',
+          message: `Activity ${activityId} not found`
+        })
+      }
+
+      else if (originalActivity.name === name) {
+        next({
+          name: 'ActivityNameExists',
+          error: 'ActivityNameExist',
+          message: `An activity with name ${name} already exists`
+        })
+        console.log(originalActivity)
+      }
+      // if (originalActivity.activityId === activityId) {
+        else {
+          const updatedActivity = await updateActivity(activityId, updateFields)
+          res.send(updatedActivity);
       }
     } catch ({ name, message }) {
       next ({ name, message });
-  }
-  
+      }
 });
 
 module.exports = activitiesRouter;
