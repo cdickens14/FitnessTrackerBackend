@@ -2,7 +2,6 @@ const client = require("./client");
 const { getUserByUsername } = require("./users");
 const { attachActivitiesToRoutines, getActivityById } = require("./activities");
 
-
 const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
   try {
     const {
@@ -168,10 +167,12 @@ const updateRoutine = async ({ id, ...fields }) => {
 
 const destroyRoutine = async (id) => {
   try {
-    const {
-      rows: routine,
-    } = await client.query(
+    // Must delete from both routines and routine_activities
+    // Not certain, but it might require two Query statements
+    const { rows: routine } = await client.query(
       `
+      DELETE FROM routine_acitivities
+      WHERE id = $1;
       DELETE FROM routines
       WHERE id = $1;
       `,
