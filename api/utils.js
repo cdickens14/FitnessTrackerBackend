@@ -1,5 +1,6 @@
 const requireUser = (req, res, next)  => {
-    if (!req.user) {
+    if (!req.user){
+    console.log(req.user)
       next({
         name: "MissingUserError",
         error: "MissingUserError",

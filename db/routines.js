@@ -169,16 +169,17 @@ const destroyRoutine = async (id) => {
   try {
     // Must delete from both routines and routine_activities
     // Not certain, but it might require two Query statements
+    // DELETE FROM routine_activities
+      // WHERE ${id} = $1;
     const { rows: routine } = await client.query(
       `
-      DELETE FROM routine_acitivities
-      WHERE id = $1;
+      
       DELETE FROM routines
-      WHERE id = $1;
+      WHERE ${id} = $1;
       `,
       [id]
     );
-    return routine;
+    return routine[0];
   } catch (err) {
     console.log(err);
   }

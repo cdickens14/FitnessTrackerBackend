@@ -9,34 +9,27 @@ routineActivitiesRouter.use((req, res, next) => {
 // PATCH /api/routine_activities/:routineActivityId
 routineActivitiesRouter.patch('/:routineActivityId', async (req, res, next) => {
   const { routineActivityId } = req.params;
-    const { routineId, activityId, duration, count } = req.body;
+  const num = parseInt(routineActivityId);
+    const { duration, count } = req.body;
 
     const updateFields = {};
-
-    if(routineId) {
-      updateFields.routineId = routineId;
-    }
-
-    if(activityId) {
-      updateFields.activityId = activityId;
-    }
 
     if(duration) {
       updateFields.duration = duration;
     }
-     if (count) {
+    if(count) {
       updateFields.count = count;
-     }
+    }
 
     try {
-      const originalRoutineActivity = await getRoutineActivityById(req.params);
+      const originalRoutineActivity = await getRoutineActivityById(num);
 
       if (originalRoutineActivity.routineActivityId === routineActivityId) {
-        const updatedRoutineActivity = await updateRoutineActivity(routineActivityId, updateFields)
+        const updatedRoutineActivity = await updateRoutineActivity({id: num, updateFields})
         res.send(updatedRoutineActivity);
       }
-    } catch ({ name, message }) {
-      next ({ name, message });
+    } catch (err) {
+      next (err);
   }
   
 });

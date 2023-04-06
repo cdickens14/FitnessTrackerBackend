@@ -10,6 +10,8 @@ usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
   next();
 });
+
+
 // POST /api/users/register
 usersRouter.post ('/register', async (req, res, next) => {
   const { username, password } = req.body;
@@ -42,25 +44,18 @@ usersRouter.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    next({
-      name: "MissingCredentialsError",
-      message: "Please supply both username and password"
-    });
+    next();
   }
 
   try {
     const user = await getUserByUsername(username);
-
+    const token = jwt.sign({ id: user.id, username: user.username}, "secret key")
     if (user && user.password === password) {
-      res.send({ message: "You're logged in!"});
+      res.send(user);
     } else {
-      next({
-        name: "IncorrectCredentialsError",
-        message: "Username or password is incorrect"
-      });
+      next();
     }
   } catch (err) {
-    console.log (err);
     next (err);
   }
 })
@@ -71,7 +66,7 @@ usersRouter.get(':username/routines', async (req, res, next) => {
   try {
     const { username } = req.params;
     const publicRoutinesByUser = await getPublicRoutinesByUser(username);
-    res.send(publicRoutinesByUser);
+    res.send(publicRoutinesByUser.user);
   } catch (err) {
     next (err);
   }

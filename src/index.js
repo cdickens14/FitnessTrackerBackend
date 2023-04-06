@@ -1,37 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import axios from 'axios';
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import Activities from './Activities.js';
+import Header from './Header.js';
+import Routines from './Routines.js';
 
 const App = () => {
-    const [activities, setActivities] = useState([]);
-    const [routines, setRoutines] = useState([]);
-
-    useEffect(() => {
-        const getActivities = async () => {
-            const response = await axios.get('/api/activities');
-            console.log(response.data)
-            setActivities(response.data);
-        }
-        getActivities();
-    }, []);
+    
     return (
         <React.Fragment>
-            <h1>Fitness Tracker</h1>
-
-            <ul>
-                {
-                    activities.map((activity, i) => {
-                        return(
-                            <li key={i}>{activity.name}</li>
-                            
-                        ) 
-                    })
-                }
-            </ul>
+            <Header />
+            {/* <Routes>
+                <Route path='/api/activities' element={<Activities />}></Route>
+                <Route path='/api/routines' element={<Routines />}></Route>
+            </Routes> */}
+            <Activities />
+            <Routines />
+           
         </React.Fragment>
         
     )
 }
 
 const root = createRoot(document.getElementById('root'));
-root.render(<App />);
+root.render(
+<HashRouter>
+    <App />
+</HashRouter>
+);

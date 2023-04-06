@@ -20,17 +20,20 @@ routinesRouter.get('/', async (req, res, next) => {
 });
 // POST /api/routines
 routinesRouter.post('/', requireUser, async (req, res, next) => {
-  const { creatorId, isPublic, name, goal } = req.body;
+  // const { creatorId, isPublic, name, goal } = req.body;
     try {
-        const routines = await createRoutine(req.body);
-        res.send(routines);
-    } catch ({ name, message }) {
-      next ({ name, message });
+        const routine = await createRoutine(req.body);
+          res.send(routine)
+        
+        
+        
+      } catch (err) {
+      next (err);
     }
 });
 
 // PATCH /api/routines/:routineId
-routinesRouter.patch('/:routineId', async (req, res, next) => {
+routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
   const { routineId } = req.params;
     const { isPublic, name, goal } = req.body;
 
@@ -39,7 +42,7 @@ routinesRouter.patch('/:routineId', async (req, res, next) => {
     if(isPublic === false) {
       updateFields.isPublic = true;
     } else {
-      updateFields.isPublic = false;
+      isPublic === true;
     }
 
     if(name) {
@@ -51,14 +54,16 @@ routinesRouter.patch('/:routineId', async (req, res, next) => {
     }
 
     try {
-      const originalRoutine = await getRoutineById(req.params);
+      const originalRoutine = await getRoutineById(routineId);
 
-      if (originalRoutine.routineId === routineId) {
+      if (originalRoutine.routineId) {
         const updatedRoutine = await updateRoutine(routineId, updateFields)
         res.send(updatedRoutine);
+      } else {
+        res.status(403)
       }
-    } catch ({ name, message }) {
-      next ({ name, message });
+    } catch (err) {
+      next (err);
   }
   
 });
