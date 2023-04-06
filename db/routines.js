@@ -14,6 +14,7 @@ const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
     `,
       [creatorId, isPublic, name, goal]
     );
+    console.log("HERE", routine);
     return routine;
   } catch (err) {
     console.log(err);
