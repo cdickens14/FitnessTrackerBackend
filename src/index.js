@@ -11,14 +11,13 @@ const App = () => {
     
     return (
         <React.Fragment>
-            <Routes>
-                <Route path='/api' element={<Home />}></Route>
+            <Header />
+            {/* <Routes>
                 <Route path='/api/activities' element={<Activities />}></Route>
                 <Route path='/api/routines' element={<Routines />}></Route>
-                <Route path='/api/users/register' element={<Register />}></Route>
-                <Route path='/api/users/login' element={<Login />}></Route>
-            </Routes>
-           
+            </Routes> */}
+            <Activities />
+            <Routines />
            
         </React.Fragment>
         
@@ -27,7 +26,7 @@ const App = () => {
 
 const root = createRoot(document.getElementById('root'));
 root.render(
-<HashRouter>
+  <HashRouter>
     <App />
-</HashRouter>
+  </HashRouter>
 );
