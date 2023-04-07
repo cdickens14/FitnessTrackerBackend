@@ -6,18 +6,6 @@ const Register = () => {
  const [username, setUsername] = useState('');
  const [password, setPassword] = useState('');
 
-// useEffect(() => {
-//     const registerUser = async () => {
-//     const response = await axios.post('/api/users/register', {
-//         username,
-//         password
-//     });
-//     setUser([user, response.data]);
-//     console.log(response.data)
-//     }
-//     registerUser();
-// }, []);
-
 const registerUser = async (event, token) => {
     event.preventDefault();
     try {

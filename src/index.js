@@ -11,13 +11,13 @@ const App = () => {
     
     return (
         <React.Fragment>
-            <Header />
-            {/* <Routes>
+            <Routes>
+                <Route path='/api' element={<Home />}></Route>
+                <Route path='/api/users/register' element={<Register />}></Route>
+                <Route path='/api/users/login' element={<Login />}></Route>
                 <Route path='/api/activities' element={<Activities />}></Route>
                 <Route path='/api/routines' element={<Routines />}></Route>
-            </Routes> */}
-            <Activities />
-            <Routines />
+            </Routes> 
            
         </React.Fragment>
         
