@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from './Header';
 import axios from 'axios';
 
 const Routines = () => {
@@ -27,13 +26,12 @@ const onChange = (event) => {
 const createRoutine = async(event) => {
     event.preventDefault();
     try {
-        const newRoutine = await axios.post('/api/routines', {
+        const response = await axios.post('/api/routines', {
             name,
             goal
             
         });
         setRoutines([...routines, response.data]);
-        console.log(response.data)
     } catch (err) {
       console.log (err);
     }

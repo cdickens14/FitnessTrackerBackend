@@ -14,14 +14,13 @@ const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
     `,
       [creatorId, isPublic, name, goal]
     );
-    console.log("HERE", routine);
     return routine;
   } catch (err) {
     console.log(err);
   }
 };
 
-const getRoutineById = async (id) => {
+const getRoutineById = async ({id}) => {
   try {
     const {
       rows: [routine],
@@ -77,7 +76,7 @@ const getAllRoutinesByUser = async ({ username }) => {
       SELECT routines.*, users.username AS "creatorName"
       FROM routines
       JOIN users ON routines."creatorId" = users.id
-      WHERE creatorId = $1;
+      WHERE "creatorId" = $1;
     `,
       [user.id]
     );
@@ -172,15 +171,14 @@ const destroyRoutine = async (id) => {
     // Not certain, but it might require two Query statements
     // DELETE FROM routine_activities
       // WHERE ${id} = $1;
-    const { rows: routine } = await client.query(
+    const { rows } = await client.query(
       `
-      
       DELETE FROM routines
       WHERE ${id} = $1;
       `,
       [id]
     );
-    return routine[0];
+    return rows;
   } catch (err) {
     console.log(err);
   }

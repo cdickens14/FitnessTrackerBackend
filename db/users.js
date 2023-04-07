@@ -19,7 +19,6 @@ const createUser = async ({ username, password }) => {
     `,
       [username, hashedPassword]
     );
-    console.log("CREATEUSER", user);
     return user;
   } catch (err) {
     console.log(err);
@@ -59,7 +58,6 @@ const getUserById = async (userId) => {
     `,
       [userId]
     );
-    //does line 37 delete password from DB?
     delete user.password;
     return user;
   } catch (err) {
@@ -79,8 +77,6 @@ const getUserByUsername = async (username) => {
     `,
       [username]
     );
-    // delete user.password;
-    console.log("GETUSERBYUSERNAME", user);
     return user;
   } catch (err) {
     console.log(err);
