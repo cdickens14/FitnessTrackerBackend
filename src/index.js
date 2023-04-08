@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import Activities from './Activities.js';
@@ -8,9 +8,15 @@ import Register from './Register.js';
 import Login from './Login.js';
 
 const App = () => {
-    
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const logOut = (token) => {
+      setIsLoggedIn(false);
+      window.localStorage.removeItem('token', `${token}`);
+  }
     return (
         <React.Fragment>
+            
             <Routes>
                 <Route path='/api' element={<Home />}></Route>
                 <Route path='/api/users/register' element={<Register />}></Route>
@@ -18,6 +24,11 @@ const App = () => {
                 <Route path='/api/activities' element={<Activities />}></Route>
                 <Route path='/api/routines' element={<Routines />}></Route>
             </Routes> 
+
+            {
+                isLoggedIn === true ?
+                <button onClick={() => logOut()}>Logout</button> : null
+            }
            
         </React.Fragment>
         

@@ -8,17 +8,13 @@ const Register = () => {
 
 const registerUser = async (event, token) => {
     event.preventDefault();
-    try {
         const response = await axios.post('/api/users/register', {
             username,
             password
         });
         setUser(user, response.data);
-        // console.log(response.data)
+        console.log(response.data)
         window.localStorage(`token, ${token}`)
-    } catch (err) {
-      next (err);
-    }
     
 }
 
@@ -31,7 +27,7 @@ if (event.target.name === 'username') {
 }
     return (
         <React.Fragment>
-            <form onSubmit={ registerUser }>
+            <form onSubmit={ () => registerUser }>
                 <input type='text' name='username' onChange={onChange} value={username} placeholder='Create Username' ></input>
                 <input type='text' name='password' onChange={onChange} value={password} placeholder ='Create Password'></input>
                 <button>Register Here</button>

@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const { JWT_SECRET } = process.env;
 require("dotenv").config()
 const { getPublicRoutinesByUser, getAllRoutinesByUser } = require("../db/routines.js");
-const { getUserByUsername, createUser, getUserById } = require("../db/users.js");
+const { getUserByUsername, createUser, getUser } = require("../db/users.js");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -52,61 +52,63 @@ usersRouter.post('/register', async (req, res, next) => {
 });
 // POST /api/users/login
 usersRouter.post('/login', async (req, res, next) => {
-  const { username, password } = req.body;
-  // if (!username || !password) {
-  //   next({
-  //     name: "MissingCredentialsError",
-  //     message: "Please supply both username and password"
-  //   });
-  // }
   try {
-    const user = await getUserByUsername(username);
-    const token = jwt.sign(
-      {
-        id: user.id,
-        username
-      },
-      JWT_SECRET
-    );
-    const hashedPassword = user.password;
-    const matchPassword = await bcrypt.compare(req.body.password, hashedPassword);
-    if (!matchPassword) return;
-    else if (matchPassword) {
-      res.send({
-        user,
-        message: "You're logged in!",
-        token
-      });
+    const { username, password } = req.body;
+    if (!(username && password)) {
+      next();
     }
-  
+      const user = await getUserByUsername(username);
+      const token = jwt.sign(
+        {
+          id: user.id,
+          username,
+        
+        },
+        JWT_SECRET
+      );
+      const hashedPassword = user.password;
+      const matchPassword = await bcrypt.compare(password, hashedPassword);
+      if (!matchPassword) return;
+      else {
+        res.send({
+          message:"You're logged in!",
+          user,
+          token
+        });
+      } 
   } catch (err) {
     next (err);
   }
 });
 // GET /api/users/me
 usersRouter.get('/me', async (req, res, next) => {
-  // const { username, password } = req.body;
-    const prefix = 'Bearer';
-    const auth = req.header('Authorization');
-
-  if(!auth) {
-      next();
-  } else if (auth.startsWith(prefix)) {
-  const token = auth.slice(prefix.length);
-  try {
-      const { id } = jwt.verify(token, JWT_SECRET);
-      if (id) {
-        req.user = await getUserById(id);
-        next();
-      }
-      } catch (err) {
-        next (err);
-      }
-  } else {
-      res.status(401).send;
+//  const { username, password } = req.body;
+ try {
+  if(!req.headers.authorization) {
+    next({ 
+      error: "NotAuthorized",
+      name: "NotAuthorized",
+      message: "You must be logged in to perform this action"
+    });
   }
+
+const authHeader = req.headers['authorization'];
+const token =  authHeader && authHeader.split(' ')[1];
+if (token === null) {
+  return res.sendStatus(401);
+}
+jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  if (err) return res.sendStatus(401);
+  req.user = user;
 });
+
   
+
+} catch (err) {
+    next (err);
+}
+    
+});
 // GET /api/users/:username/routines
 usersRouter.get('/:username/routines', async (req, res, next) => {
   try {

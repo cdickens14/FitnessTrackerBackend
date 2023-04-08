@@ -44,8 +44,7 @@ return (
             {
                 routines.map((routine, i) => {
                     return(
-                        <li key={i}>{routine.name} <br />
-                        {routine.goal} </li>
+                        <li key={i}>{routine.name} <br /> {routine.goal} <br /> {routine.creatorId}</li>
                         
                     ) 
                 })
