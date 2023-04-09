@@ -8,9 +8,9 @@ const Routines = () => {
 
     useEffect(() => {
         const getRoutines = async () => {
-        const response = await axios.get('/api/routines');
-        console.log(response.data)
-        setRoutines(response.data);
+            const response = await axios.get('/api/routines');
+            console.log(response.data)
+            setRoutines(response.data);
     }
     getRoutines();
 }, []);
@@ -23,17 +23,73 @@ const onChange = (event) => {
     }
 }
 
-const createRoutine = async(event) => {
+const handleSubmit = (event) => {
     event.preventDefault();
+}
+
+const createRoutine = async (token) => {
+        try {
+          const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
+            method: "POST",
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.localStorage.getItem('token', `${token}`)}`
+            },
+            body: JSON.stringify({
+                routine: {
+                    name: `${name}`,
+                    goal: `${goal}`,
+                    isPublic: true
+                }
+             
+            })
+          });
+          const result = await response.json();
+          console.log(result);
+          return result
+        } catch (err) {
+          console.error(err);
+        }
+}
+
+const editRoutine = async (token) => {
     try {
-        const response = await axios.post('/api/routines', {
-            name,
-            goal
-            
-        });
-        setRoutines([...routines, response.data]);
+        const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/:routineId', {
+            method: "PATCH",
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.localStorage.getItem('token', `${token}`)}`
+            },
+            body: JSON.stringify({
+                routine: {
+                    name: `${name}`,
+                    goal: `${goal}`
+                }
+            })
+          });
+          const result = await response.json();
+          console.log(result);
+          return result
+
     } catch (err) {
-      console.log (err);
+    console.error (err);
+    }
+}
+
+const deleteRoutine = async (token) => {
+    try {
+        const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/:routineId', {
+            method: "DELETE",
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.localStorage.getItem('token', `${token}`)}`
+            },
+          });
+          const result = await response.json();
+          console.log(result);
+          return result
+    } catch (err) {
+      console.error(err);
     }
 }
 
@@ -43,18 +99,27 @@ return (
          <ul>
             {
                 routines.map((routine, i) => {
-                    return(
-                        <li key={i}>{routine.name} <br /> {routine.goal} <br /> {routine.creatorId}</li>
+                    return (
+                        <React.Fragment>
+                            <li key={i}>{routine.name}</li> 
+                            <li>{routine.goal}</li>
+                            <li>{routine.creatorId}</li>
+                            <button onClick={() => editRoutine()}>Edit</button>
+                            <button onClick={() => deleteRoutine()}>Delete</button>
+                            
+                        </React.Fragment>
+                        
                         
                     ) 
                 })
             }
-            <form onSubmit={ createRoutine }>
+         </ul>
+            <form onSubmit={ handleSubmit }>
                 <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Routine'></input>
                 <input type='text' name='goal' onChange={onChange} value={goal} placeholder='Goal'></input>
-                <button>Create Routine</button>
+                <button onClick={ createRoutine }>Create Routine</button>
             </form>
-        </ul>
+       
 
 
 

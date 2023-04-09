@@ -53,7 +53,7 @@ app.use(cors());
 
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 
-app.use('/style', express.static(path.join(__dirname, 'style')));
+app.use('/style.css', express.static(path.join(__dirname, 'style.css')))
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'style.css')));

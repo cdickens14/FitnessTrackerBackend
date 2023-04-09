@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const { JWT_SECRET } = process.env;
 require("dotenv").config()
 const { getPublicRoutinesByUser, getAllRoutinesByUser } = require("../db/routines.js");
-const { getUserByUsername, createUser, getUser } = require("../db/users.js");
+const { getUserByUsername, createUser } = require("../db/users.js");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -17,6 +17,7 @@ usersRouter.use((req, res, next) => {
 // POST /api/users/register
 usersRouter.post('/register', async (req, res, next) => {
   const { username, password } = req.body;
+ 
   try {
     const _user = await getUserByUsername(username);
     if (_user) {
@@ -30,7 +31,7 @@ usersRouter.post('/register', async (req, res, next) => {
     const token = jwt.sign(
       {
         id: user.id,
-        username,
+        username
       },
       "secret"
     );
@@ -54,18 +55,22 @@ usersRouter.post('/register', async (req, res, next) => {
 usersRouter.post('/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    if (!(username && password)) {
+
+    if ((!username && password)) {
       next();
     }
       const user = await getUserByUsername(username);
+      
       const token = jwt.sign(
         {
           id: user.id,
-          username,
+          username
         
         },
-        JWT_SECRET
+         JWT_SECRET
+        
       );
+    
       const hashedPassword = user.password;
       const matchPassword = await bcrypt.compare(password, hashedPassword);
       if (!matchPassword) return;
@@ -82,25 +87,31 @@ usersRouter.post('/login', async (req, res, next) => {
 });
 // GET /api/users/me
 usersRouter.get('/me', async (req, res, next) => {
-//  const { username, password } = req.body;
+// const { username } = req.
+// console.log('RQ', req)
  try {
-  if(!req.headers.authorization) {
-    next({ 
+  const user = await getUserByUsername();
+ 
+  // console.log("USER", username)
+  const authHeader = req.headers['authorization'];
+  // console.log('OTHER',authHeader)
+  const token =  authHeader && authHeader.split(' ')[1];
+  // console.log('TOKEN', token)
+  if(!token) {
+    res.status(401).send ({ 
       error: "NotAuthorized",
       name: "NotAuthorized",
       message: "You must be logged in to perform this action"
     });
+  } else {
+    res.send(user)
   }
 
-const authHeader = req.headers['authorization'];
-const token =  authHeader && authHeader.split(' ')[1];
-if (token === null) {
-  return res.sendStatus(401);
-}
-jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-  if (err) return res.sendStatus(401);
-  req.user = user;
-});
+
+// jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+//   if (err) return res.sendStatus(401);
+//   req.user = user;
+// });
 
   
 

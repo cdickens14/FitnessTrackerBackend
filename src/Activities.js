@@ -9,7 +9,6 @@ const Activities = () =>{
     useEffect(() => {
         const getActivities = async () => {
         const response = await axios.get('/api/activities');
-        // console.log(response.data)
         setActivities(response.data);
     }
     getActivities();
