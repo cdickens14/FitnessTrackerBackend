@@ -87,16 +87,13 @@ usersRouter.post('/login', async (req, res, next) => {
 });
 // GET /api/users/me
 usersRouter.get('/me', async (req, res, next) => {
-// const { username } = req.
-// console.log('RQ', req)
  try {
   const user = await getUserByUsername();
- 
-  // console.log("USER", username)
+
   const authHeader = req.headers['authorization'];
-  // console.log('OTHER',authHeader)
+
   const token =  authHeader && authHeader.split(' ')[1];
-  // console.log('TOKEN', token)
+
   if(!token) {
     res.status(401).send ({ 
       error: "NotAuthorized",
@@ -106,14 +103,6 @@ usersRouter.get('/me', async (req, res, next) => {
   } else {
     res.send(user)
   }
-
-
-// jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-//   if (err) return res.sendStatus(401);
-//   req.user = user;
-// });
-
-  
 
 } catch (err) {
     next (err);
