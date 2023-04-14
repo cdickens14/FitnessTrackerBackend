@@ -14,6 +14,14 @@ h1 {
   justify-content: center;
 }
 
+#login {
+  border: solid black 2px;
+  background-color: gainsboro;
+  color: black;
+  font-size: 20px;
+  margin: 5px;
+}
+
 .link {
   display: flex;
   justify-content: space-between;

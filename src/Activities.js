@@ -8,7 +8,7 @@ const Activities = () => {
 
   useEffect(() => {
     const getActivities = async () => {
-      const response = await axios.get("/api/activities");
+      const response = await axios.get('/api/activities');
       setActivities(response.data);
     };
     getActivities();
@@ -25,7 +25,7 @@ const Activities = () => {
   const createActivity = async (event) => {
     event.preventDefault();
     try {
-        const newActivity = await axios.post('/api/activities', {
+        const activity = await axios.post('/api/activities', {
             name,
             description
             

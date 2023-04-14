@@ -6,9 +6,15 @@ import Home from './Home.js';
 import Routines from './Routines.js';
 import Register from './Register.js';
 import Login from './Login.js';
+import Header from './Header.js';
 
 const App = () => {
+  const [currentForm, setCurrentForm] = useState('login');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // const toggleForm = (formName) => {
+  //   setCurrentForm(formName);
+  // }
 
   const logOut = (token) => {
     setIsLoggedIn === false;
@@ -24,9 +30,11 @@ const App = () => {
 
     return (
         <React.Fragment>
+          <Header />
+          {/* {
+            currentForm === 'login' ? <Login onFormSubmit={toggleForm} /> : <Register onFormSubmit={toggleForm} />
+          } */}
 
-            
-            
             <Routes>
                 <Route path='/api' element={<Home />}></Route>
                 <Route path='/api/users/register' element={<Register />}></Route>

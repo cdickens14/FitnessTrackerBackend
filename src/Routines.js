@@ -38,25 +38,13 @@ const createRoutine = async (event) => {
         }
 }
 
-const editRoutine = async (token) => {
+const editRoutine = async () => {
     try {
-        const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/:routineId', {
-            method: "PATCH",
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                routine: {
-                    name: `${name}`,
-                    goal: `${goal}`
-                }
-            })
-          });
-          const result = await response.json();
-          console.log(result);
-          return result
-
+        const response = await axios.patch('/api/routines/:routineId', {
+          duration,
+          count
+        });
+        setRoutines([...routines, response.data])
     } catch (err) {
     console.error (err);
     }
@@ -106,7 +94,7 @@ const editRoutine = async (token) => {
                 })
             }
          </ul>
-            <form onSubmit={ handleSubmit }>
+            <form onSubmit={ createRoutine }>
                 <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Routine'></input>
                 <input type='text' name='goal' onChange={onChange} value={goal} placeholder='Goal'></input>
                 <button onClick={ createRoutine }>Create Routine</button>

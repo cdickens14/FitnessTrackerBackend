@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 const Home = () => {
     return (
         <React.Fragment>
-            <h1>Fitness Tracker Homepage</h1>
             <Link to='/api/users/login' id="login">Login Here</Link>
             <Link to='/api/users/register' className='button'>Not a User? Register Here!</Link>
             <Link to='/api/activities' className='link'>Go to Activities</Link>

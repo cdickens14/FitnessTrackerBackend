@@ -18,15 +18,6 @@ const signIn = async () => {
         const result = await response.data;
         console.log(result);
         props.setIsLoggedIn === true;
-        // if (data.user) {
-        //     await window.localStorage.setItem('token', data.token);
-        //     await setUser({
-        //         ...user,
-        //         token: data.token,
-        //         userId: data.user.id
-        //     });
-        // }
-        
         return result
       } catch (err) {
         console.error(err);
