@@ -25,7 +25,7 @@ const onChange = (event) => {
 const createActivity = async(event) => {
     event.preventDefault();
     try {
-        const newActivity = await axios.post('/api/activities', {
+        const response = await axios.post('/api/activities', {
             name,
             description
             
@@ -43,15 +43,17 @@ const createActivity = async(event) => {
             <h1>Activities</h1>
                 {
                     activities.map((activity, i) => {
-                        return(
-                            <li key={i}>{activity.name} <br />   
-                            {activity.description} 
-                            </li> 
-                     
+                        return (
+                            <React.Fragment>
+                                <li id="activity-name"key={i}>{activity.name}</li>
+                                <li>{activity.id}</li> 
+                                <li>{activity.description}</li>
+                            </React.Fragment>
                             
                         ) 
                     })
                 }
+                            
             <form onSubmit={ createActivity }>
                 <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Activity'></input>
                 <input type='text' name='description' onChange={onChange} value={description} placeholder='Description of Activity'></input>

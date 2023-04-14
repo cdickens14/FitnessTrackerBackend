@@ -1,6 +1,6 @@
 const client = require("./client");
 const { getUserByUsername } = require("./users");
-const { attachActivitiesToRoutines, getActivityById } = require("./activities");
+const { attachActivitiesToRoutines } = require("./activities");
 
 const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
   try {
@@ -70,7 +70,7 @@ const getAllRoutinesByUser = async ({ username }) => {
   try {
     const user = await getUserByUsername(username);
     const {
-      rows: [routines],
+      rows: routines,
     } = await client.query(
       `
       SELECT routines.*, users.username AS "creatorName"
@@ -80,7 +80,7 @@ const getAllRoutinesByUser = async ({ username }) => {
     `,
       [user.id]
     );
-    return routines;
+    return attachActivitiesToRoutines(routines);
   } catch (err) {
     console.log(err);
   }
@@ -88,7 +88,7 @@ const getAllRoutinesByUser = async ({ username }) => {
 
 const getPublicRoutinesByActivity = async ({ id }) => {
   try {
-    // const activity = getActivityById(id);
+  
     const { rows: routines } = await client.query(
       `
       SELECT routines.*, users.username AS "creatorName"
@@ -128,8 +128,9 @@ const getPublicRoutinesByUser = async ({ username }) => {
       SELECT routines.*, users.username AS "creatorName"
       FROM routines
       JOIN users ON routines."creatorId" = users.id
-      WHERE "isPublic"=true;
-      `
+      WHERE "creatorId"=$1;
+      `,
+      [user.id]
     );
     return attachActivitiesToRoutines(routines);
   } catch (err) {
@@ -138,7 +139,7 @@ const getPublicRoutinesByUser = async ({ username }) => {
 };
 
 const updateRoutine = async ({ id, ...fields }) => {
-  const setString = Object.keys(fields)
+  const setString = Object.keys(fields.updateFields)
     .map((key, index) => `"${key}"=$${index + 1}`)
     .join(", ");
 
@@ -156,7 +157,7 @@ const updateRoutine = async ({ id, ...fields }) => {
       WHERE id=${id}
       RETURNING *;
     `,
-      Object.values(fields)
+      Object.values(fields.updateFields)
     );
 
     return routine;
@@ -167,10 +168,6 @@ const updateRoutine = async ({ id, ...fields }) => {
 
 const destroyRoutine = async (id) => {
   try {
-    // Must delete from both routines and routine_activities
-    // Not certain, but it might require two Query statements
-    // DELETE FROM routine_activities
-      // WHERE ${id} = $1;
     const { rows } = await client.query(
       `
       DELETE FROM routines
@@ -180,7 +177,7 @@ const destroyRoutine = async (id) => {
     );
     return rows;
   } catch (err) {
-    console.log(err);
+    console.log (err)
   }
 };
 

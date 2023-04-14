@@ -1,37 +1,39 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Login = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [user, setUser] = useState('');
 
 const handleSubmit = (event) => {
     event.preventDefault();
 }
-const signIn = async (token) => {
+const signIn = async () => {
     try {
-        const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/users/login', {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            user: {
-                username: `${username}`,
-                password: `${password}`
-            }
-              
-          })
+        const response = await axios.post('/api/users/login', {
+            username,
+            password
         });
-        const result = await response.json();
+        const result = await response.data;
         console.log(result);
         props.setIsLoggedIn === true;
-        window.localStorage.setItem('token', `${token}`)
+        // if (data.user) {
+        //     await window.localStorage.setItem('token', data.token);
+        //     await setUser({
+        //         ...user,
+        //         token: data.token,
+        //         userId: data.user.id
+        //     });
+        // }
+        
         return result
       } catch (err) {
         console.error(err);
       }
     
 }
+
 
 const onChange = (event) => {
     if (event.target.name === 'username') {
@@ -44,13 +46,11 @@ const onChange = (event) => {
         <React.Fragment>
             <form onSubmit={handleSubmit}>
                 <input type='text' name='username' onChange={onChange} value={username} placeholder='Username'></input>
-                <input type='text' name='password' onChange={onChange}value={password} placeholder='Password'></input>
+                <input type='text' name='password' onChange={onChange} value={password} placeholder='Password'></input>
                 <button type ='submit' onClick={() => signIn()}>Login</button>
             </form>
-            {
-                props.isLoggedIn === true ?
-                <Home /> : null
-            }
+           
+
         </React.Fragment>
     )
 }

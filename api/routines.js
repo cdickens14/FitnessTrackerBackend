@@ -1,12 +1,11 @@
 const express = require("express");
 const routinesRouter = express.Router();
-const { attachActivitiesToRoutines } = require("../db/activities.js");
+const { attachActivitiesToRoutines, getActivityById } = require("../db/activities.js");
 const {
   getAllRoutines,
   createRoutine,
-  getRoutineById,
   updateRoutine,
-  destroyRoutine,
+  getRoutineById,
 } = require("../db/routines.js");
 const { requireUser } = require("./utils");
 
@@ -26,12 +25,20 @@ routinesRouter.get('/', async (req, res, next) => {
 });
 // POST /api/routines
 routinesRouter.post('/', requireUser, async (req, res, next) => {
-  const { creatorId, isPublic, name, goal } = req.body;
+  const { isPublic, name, goal } = req.body;
+  const creatorId = req.user.id;
     try {
-        const routine = await createRoutine(req.body);
-        if (req.body.creatorId === req.user) {
-          res.send(routine)
-        }
+      if(!req.user) {
+        next({
+          name: "NotAuthorized",
+          error: "NotAuthorized",
+          message: "You are not authorized to create the routine"
+        })
+      } else {
+        const routine = await createRoutine({ creatorId, isPublic, name, goal });
+        res.send(routine);
+      }
+        
     } catch (err) {
       next (err);
     }
@@ -42,14 +49,14 @@ routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
   const { routineId } = req.params;
   const num = parseInt(routineId);
   const { isPublic, name, goal } = req.body;
-
+ 
   const updateFields = {};
 
-    if(isPublic === false) {
-      updateFields.isPublic = true;
-    } else {
-      updateFields.isPublic = true;
-    }
+  if(isPublic === true) {
+    updateFields.isPublic = true;
+  } else {
+    updateFields.isPublic = false;
+  }
 
   if (name) {
     updateFields.name = name;
@@ -60,12 +67,12 @@ routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
   }
 
     try {
-      // const originalRoutine = await getRoutineById(num);
-
-      // if (originalRoutine.routineId === routineId) {
-        const updatedRoutine = await updateRoutine({id: num, updateFields})
-        res.send(updatedRoutine);
-      // }
+      const updatedRoutine = await updateRoutine({id:num, updateFields})
+      res.send(updatedRoutine);
+      if (req.user.id !== updatedRoutine.creatorId){
+        res.status(403).send("Unauthorized update error");
+      }
+      
     } catch (err) {
       next (err);
   }
@@ -74,9 +81,21 @@ routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
 // DELETE /api/routines/:routineId
 routinesRouter.delete('/:routineId', async (req, res, next) => {
   const { routineId } = req.params;
+  const id = req.user.id;
+
   try {
-    const _routineId = await destroyRoutine(req.params);
-    res.send(_routineId);
+    const routine = await getRoutineById(routineId);
+    console.log("RI", routine)
+    if (routine.creatorId !== id) {
+      res.status(403).send({
+        name: "NotAllowedToUpdate",
+        error: "NotAllowedToUpdate",
+        message: `User ${req.user} is not allowed to update ${routine}`
+      });
+    } else {
+      res.send(routine);
+    }
+    
   } catch (err) {
     next (err);
   }
@@ -85,8 +104,17 @@ routinesRouter.delete('/:routineId', async (req, res, next) => {
 routinesRouter.post('/:routineId/activities', async (req, res, next) => {
   const { routineId } = req.params;
   const num = parseInt(routineId);
+
   try {
-    const routineId = await attachActivitiesToRoutines(num);
+    const routine = await attachActivitiesToRoutines(routineId);
+    const activityId = await getActivityById(num)
+    if (routineId === activityId) {
+      next({
+        name: "ActivityAlreadyExists",
+        error: "ActivityAlreadyExists",
+        message:`Activity ID ${id} already exists in Routine ID ${id}`
+      })
+    }
     res.send(routineId);
   } catch (err) {
     next(err);

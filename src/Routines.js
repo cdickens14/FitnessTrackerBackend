@@ -23,30 +23,16 @@ const onChange = (event) => {
     }
 }
 
-const handleSubmit = (event) => {
+const createRoutine = async (event) => {
     event.preventDefault();
-}
-
-const createRoutine = async (token) => {
         try {
-          const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
-            method: "POST",
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.localStorage.getItem('token', `${token}`)}`
-            },
-            body: JSON.stringify({
-                routine: {
-                    name: `${name}`,
-                    goal: `${goal}`,
-                    isPublic: true
-                }
-             
-            })
-          });
-          const result = await response.json();
-          console.log(result);
-          return result
+            const response = await axios.post('/api/routines', {
+                name,
+                goal
+                
+            });
+            setRoutines([...routines, response.data]);
+            console.log(response.data);
         } catch (err) {
           console.error(err);
         }
@@ -58,7 +44,7 @@ const editRoutine = async (token) => {
             method: "PATCH",
             headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.localStorage.getItem('token', `${token}`)}`
+            'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 routine: {
@@ -114,10 +100,10 @@ return (
                 })
             }
          </ul>
-            <form onSubmit={ handleSubmit }>
+            <form onSubmit={ createRoutine }>
                 <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Routine'></input>
                 <input type='text' name='goal' onChange={onChange} value={goal} placeholder='Goal'></input>
-                <button onClick={ createRoutine }>Create Routine</button>
+                <button>Create Routine</button>
             </form>
        
 

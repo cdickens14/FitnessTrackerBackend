@@ -2,7 +2,6 @@ const express = require('express');
 const activitiesRouter = express.Router();
 const { getAllActivities, createActivity, updateActivity, getActivityById, getActivityByName } = require('../db/activities.js');
 const { getPublicRoutinesByActivity } = require('../db/routines');
-const { requireUser } = require('./utils');
 
 activitiesRouter.use((req, res, next) => {
     console.log("A request is being made to /activities");
@@ -13,8 +12,6 @@ activitiesRouter.use((req, res, next) => {
 activitiesRouter.get('/:activityId/routines', async (req, res, next) => {
   const { activityId } = req.params;
     try {
-        
-       
         const _activity = await getActivityById(activityId);
         if(!_activity) {
           next ({ 

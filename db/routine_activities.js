@@ -61,7 +61,7 @@ const getRoutineActivitiesByRoutine = async ({ id }) => {
 };
 
 const updateRoutineActivity = async ({ id, ...fields }) => {
-  const setString = Object.keys(fields)
+  const setString = Object.keys(fields.updateFields)
     .map((key, index) => `"${key}"=$${index + 1}`)
     .join(", ");
 
@@ -79,7 +79,7 @@ const updateRoutineActivity = async ({ id, ...fields }) => {
       WHERE id=${id}
       RETURNING *;
     `,
-      Object.values(fields)
+      Object.values(fields.updateFields)
     );
 
     return routineActivity;
