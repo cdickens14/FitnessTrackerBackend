@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Routines = () => {
-    const [routines, setRoutines] = useState([]);
-    const [name, setName] = useState('');
-    const [goal, setGoal] = useState('');
+  const [routines, setRoutines] = useState([]);
+  const [name, setName] = useState("");
+  const [goal, setGoal] = useState("");
 
-    useEffect(() => {
-        const getRoutines = async () => {
-            const response = await axios.get('/api/routines');
-            console.log(response.data)
-            setRoutines(response.data);
-    }
+  useEffect(() => {
+    const getRoutines = async () => {
+      const response = await axios.get("/api/routines");
+      console.log(response.data);
+      setRoutines(response.data);
+    };
     getRoutines();
-}, []);
+  }, []);
 
-const onChange = (event) => {
-    if(event.target.name === 'name') {
-        setName(event.target.value);
+  const onChange = (event) => {
+    if (event.target.name === "name") {
+      setName(event.target.value);
     } else {
-        setGoal(event.target.value);
+      setGoal(event.target.value);
     }
-}
+  };
 
 const createRoutine = async (event) => {
     event.preventDefault();
@@ -62,24 +62,30 @@ const editRoutine = async (token) => {
     }
 }
 
-const deleteRoutine = async (token) => {
+  const deleteRoutine = async (token) => {
     try {
-        const response = await fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/:routineId', {
-            method: "DELETE",
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.localStorage.getItem('token', `${token}`)}`
-            },
-          });
-          const result = await response.json();
-          console.log(result);
-          return result
+      const response = await fetch(
+        "http://fitnesstrac-kr.herokuapp.com/api/routines/:routineId",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${window.localStorage.getItem(
+              "token",
+              `${token}`
+            )}`,
+          },
+        }
+      );
+      const result = await response.json();
+      console.log(result);
+      return result;
     } catch (err) {
       console.error(err);
     }
-}
+  };
 
-return (
+  return (
     <React.Fragment>
         <h1>Routines</h1>
          <ul>
@@ -100,18 +106,17 @@ return (
                 })
             }
          </ul>
-            <form onSubmit={ createRoutine }>
+            <form onSubmit={ handleSubmit }>
                 <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Routine'></input>
                 <input type='text' name='goal' onChange={onChange} value={goal} placeholder='Goal'></input>
-                <button>Create Routine</button>
+                <button onClick={ createRoutine }>Create Routine</button>
             </form>
        
 
 
 
     </React.Fragment>
-)
-
-}
+  );
+};
 
 export default Routines;

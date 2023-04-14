@@ -6,7 +6,7 @@ const Login = (props) => {
     const [password, setPassword] = useState('');
     const [user, setUser] = useState('');
 
-const handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 }
 const signIn = async () => {
@@ -39,7 +39,7 @@ const onChange = (event) => {
     if (event.target.name === 'username') {
         setUsername(event.target.value)
     } else {
-        setPassword(event.target.value)
+      setPassword(event.target.value);
     }
     }
     return (
