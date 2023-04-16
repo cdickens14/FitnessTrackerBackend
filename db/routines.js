@@ -80,7 +80,7 @@ const getAllRoutinesByUser = async ({ username }) => {
     `,
       [user.id]
     );
-    return attachActivitiesToRoutines(routines);
+    return routines;
   } catch (err) {
     console.log(err);
   }
@@ -170,12 +170,19 @@ const destroyRoutine = async (id) => {
   try {
     const { rows } = await client.query(
       `
-      DELETE FROM routines
-      WHERE ${id} = $1;
-      `,
-      [id]
+      DELETE 
+      FROM routine_activities
+      WHERE "routineId" = ${id};
+      `
     );
-    return rows;
+    await client.query(
+      `
+      DELETE 
+      FROM routines
+      WHERE id = ${id};
+      `
+    );
+     
   } catch (err) {
     console.log (err)
   }

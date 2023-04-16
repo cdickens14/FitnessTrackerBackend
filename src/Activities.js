@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const Activities = () => {
+const Activities = ({ isLoggedIn }) => {
   const [activities, setActivities] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -25,7 +25,7 @@ const Activities = () => {
   const createActivity = async (event) => {
     event.preventDefault();
     try {
-        const activity = await axios.post('/api/activities', {
+        const response = await axios.post('/api/activities', {
             name,
             description
             
@@ -43,19 +43,34 @@ const Activities = () => {
                 {
                     activities.map((activity, i) => {
                         return(
-                            <li key={i}>{activity.name} <br />   
-                            {activity.description} 
-                            </li> 
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Description</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>{activity.name}</td>
+                                  <td>{activity.description}</td>
+                                </tr>
+                              </tbody>
+                            </table> 
                      
                             
                         ) 
                     })
                 }
-            <form onSubmit={ createActivity }>
-                <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Activity'></input>
-                <input type='text' name='description' onChange={onChange} value={description} placeholder='Description of Activity'></input>
-                <button>Create Activity</button>
-            </form>
+                {
+                  isLoggedIn === true ? 
+                  <form onSubmit={ createActivity }>
+                    <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Activity'></input>
+                    <input type='text' name='description' onChange={onChange} value={description} placeholder='Description of Activity'></input>
+                    <button>Create Activity</button>
+                  </form> : null
+                }
+            
 
 
         </React.Fragment>

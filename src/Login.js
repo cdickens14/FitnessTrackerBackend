@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Home from './Home';
 
-const Login = (props) => {
+
+const Login = ({ setIsLoggedIn, isLoggedIn }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [user, setUser] = useState('');
 
-  const handleSubmit = (event) => {
+const signIn = async (event) => {
     event.preventDefault();
-}
-const signIn = async () => {
     try {
         const response = await axios.post('/api/users/login', {
             username,
@@ -17,8 +17,9 @@ const signIn = async () => {
         });
         const result = await response.data;
         console.log(result);
-        props.setIsLoggedIn === true;
-        return result
+        setUser(response.data)
+        setIsLoggedIn(true);
+        window.localStorage.setItem('token', response.data.token);
       } catch (err) {
         console.error(err);
       }
@@ -35,13 +36,12 @@ const onChange = (event) => {
     }
     return (
         <React.Fragment>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={signIn}>
                 <input type='text' name='username' onChange={onChange} value={username} placeholder='Username'></input>
                 <input type='text' name='password' onChange={onChange} value={password} placeholder='Password'></input>
-                <button type ='submit' onClick={() => signIn()}>Login</button>
+                <button type ='submit'>Login</button>
             </form>
            
-
         </React.Fragment>
     )
 }

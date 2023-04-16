@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import ReadOnlyRow from "./ReadOnlyRow";
+import EditRow from './EditRow';
 
-const Routines = () => {
+const Routines = ({ isLoggedIn }) => {
   const [routines, setRoutines] = useState([]);
-  const [name, setName] = useState("");
-  const [goal, setGoal] = useState("");
+  const [name, setName] = useState('');
+  const [goal, setGoal] = useState('');
+  const [editRoutine, setEditRoutine] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    id: '',
+    name: '',
+    goal: ''
+  });
+ 
 
   useEffect(() => {
     const getRoutines = async () => {
-      const response = await axios.get("/api/routines");
+      const response = await axios.get('/api/routines');
       console.log(response.data);
       setRoutines(response.data);
     };
@@ -23,10 +32,19 @@ const Routines = () => {
     }
   };
 
+const baseURL = 'http://localhost:3000/api';
+const token = window.localStorage.getItem('token')
+const authAxios = axios.create({
+  baseURL: baseURL,
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+
 const createRoutine = async (event) => {
     event.preventDefault();
         try {
-            const response = await axios.post('/api/routines', {
+            const response = await authAxios.post('/routines', {
                 name,
                 goal
                 
@@ -38,40 +56,40 @@ const createRoutine = async (event) => {
         }
 }
 
-const editRoutine = async () => {
-    try {
-        const response = await axios.patch('/api/routines/:routineId', {
-          duration,
-          count
-        });
-        setRoutines([...routines, response.data])
-    } catch (err) {
-    console.error (err);
-    }
+const handleEditClick = (event, name, goal) => {
+  event.preventDefault();
+  setEditRoutine(name, goal);
+
+  const formValues = {
+    name: name,
+    goal: goal
+  }
+  setEditFormData(formValues);
 }
 
-  const deleteRoutine = async (token) => {
-    try {
-      const response = await fetch(
-        "http://fitnesstrac-kr.herokuapp.com/api/routines/:routineId",
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${window.localStorage.getItem(
-              "token",
-              `${token}`
-            )}`,
-          },
-        }
-      );
-      const result = await response.json();
-      console.log(result);
-      return result;
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const handleEditFormChange = (event) => {
+  event.preventDefault();
+  const fieldName = event.target.getAttribute('name');
+  const fieldValue = event.target.value;
+  const newFormData = {...editFormData};
+  newFormData[fieldName] = fieldValue;
+  setEditFormData(newFormData);
+
+}
+
+const handleEditFormSubmit = (event) => {
+  event.preventDefault();
+
+  const editedRoutine = {
+    id: editFormData.id,
+    name: editFormData.name,
+    goal: editFormData.goal
+  }
+  const newRoutines = [...routines];
+  const index = routines.findIndex((routine) => routine.id === editRoutine.id)
+  newRoutines[index] = editedRoutine;
+  setRoutines(newRoutines);
+}
 
   return (
     <React.Fragment>
@@ -81,11 +99,25 @@ const editRoutine = async () => {
                 routines.map((routine, i) => {
                     return (
                         <React.Fragment>
-                            <li key={i}>{routine.name}</li> 
-                            <li>{routine.goal}</li>
-                            <li>{routine.creatorId}</li>
-                            <button onClick={() => editRoutine()}>Edit</button>
-                            <button onClick={() => deleteRoutine()}>Delete</button>
+                          <form onSubmit={handleEditFormSubmit}>
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Goal</th>
+                                  <th>CreatorName</th>
+                                  <th>Routine Id</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                { editRoutine === routine.name ? (
+                                  <EditRow editFormData={editFormData} handleEditFormChange={handleEditFormChange}/>
+                                ) : (
+                                  <ReadOnlyRow isLoggedIn={isLoggedIn} routine={routine} handleEditClick={handleEditClick}/>
+                                )}
+                              </tbody>
+                            </table> 
+                          </form>
                             
                         </React.Fragment>
                         
@@ -94,15 +126,15 @@ const editRoutine = async () => {
                 })
             }
          </ul>
-            <form onSubmit={ createRoutine }>
-                <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Routine'></input>
-                <input type='text' name='goal' onChange={onChange} value={goal} placeholder='Goal'></input>
-                <button onClick={ createRoutine }>Create Routine</button>
-            </form>
-       
-
-
-
+         {
+          isLoggedIn === true ? 
+          <form onSubmit={ createRoutine }>
+            <input type='text' name='name' onChange={onChange} value={name} placeholder='Name of Routine'></input>
+            <input type='text' name='goal' onChange={onChange} value={goal} placeholder='Goal'></input>
+            <button onClick={ createRoutine }>Create Routine</button>
+          </form> : null
+         }
+        
     </React.Fragment>
   );
 };

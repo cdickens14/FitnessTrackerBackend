@@ -6,6 +6,7 @@ const {
   createRoutine,
   updateRoutine,
   getRoutineById,
+  destroyRoutine,
 } = require("../db/routines.js");
 const { requireUser } = require("./utils");
 
@@ -79,21 +80,25 @@ routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
 });
 
 // DELETE /api/routines/:routineId
-routinesRouter.delete('/:routineId', async (req, res, next) => {
+routinesRouter.delete('/:routineId', requireUser, async (req, res, next) => {
   const { routineId } = req.params;
   const id = req.user.id;
 
   try {
     const routine = await getRoutineById(routineId);
-    console.log("RI", routine)
-    if (routine.creatorId !== id) {
-      res.status(403).send({
-        name: "NotAllowedToUpdate",
-        error: "NotAllowedToUpdate",
-        message: `User ${req.user} is not allowed to update ${routine}`
-      });
-    } else {
-      res.send(routine);
+    if(routine) {
+      if (routine.creatorId !== id) {
+     
+        res.status(403).send({
+          name: "NotAllowedToUpdate",
+          error: "NotAllowedToUpdate",
+          message: `User ${req.user} is not allowed to update ${routine}`
+        });
+      } else {
+        await destroyRoutine(routineId)
+        res.send(routine);
+      }
+      
     }
     
   } catch (err) {

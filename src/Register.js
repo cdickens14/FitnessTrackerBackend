@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const Register = () => {
+const Register = ({ isLoggedIn, setIsLoggedIn }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
+  const registerUser = async (event) => {
     event.preventDefault();
-  };
-  const registerUser = async (token) => {
     const response = await axios.post("/api/users/register", {
       username,
       password,
@@ -16,10 +14,11 @@ const Register = () => {
     setUsername(response.data);
     setPassword(response.data);
     console.log(response.data);
-    window.localStorage.setItem(token, `${token}`);
+    window.localStorage.setItem('token', response.data.token);
+    setIsLoggedIn(true);
 
-    setUsername("");
-    setPassword("");
+    setUsername('');
+    setPassword('');
   };
 
   const onChange = (event) => {
@@ -31,7 +30,7 @@ const Register = () => {
   };
   return (
     <React.Fragment>
-      <form id="registerForm" onSubmit={handleSubmit}>
+      <form id="registerForm" onSubmit={registerUser}>
         <input
           type="text"
           name="username"
