@@ -4,9 +4,6 @@ const app = express();
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const { getUserById } = require('./db/users');
-const { JWT_SECRET } = process.env;
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -14,40 +11,35 @@ app.use(express.json());
 const apiRouter = require('./api/index.js');
 app.use('/api', apiRouter);
 
-apiRouter.use((req, res, next) => {
-  if(req.user) {
-    console.log('User is set:', req.user);
+apiRouter.use(async (req, res, next) => {
+  const prefix = 'Bearer '
+  const auth = req.headers['Authorization'];
+
+  if (!auth) {
+    next(); // don't set req.user, no token was passed in
   }
-  next();
+
+
+  if (auth.startsWith(prefix)) {
+    // recover the token
+    const token = auth.slice(prefix.length);
+    try {
+      // recover the data
+      const { id } = jwt.verify(data, 'secret message');
+
+      // get the user from the database
+      const user = await getUserById(id);
+      // note: this might be a user or it might be null depending on if it exists
+
+      // attach the user and move on
+      req.user = user;
+
+      next();
+    } catch (error) {
+      // there are a few types of errors here
+    }
+  }
 });
-
-// apiRouter.use(async (req, res, next) => {
-//   const prefix = 'Bearer';
-//   const auth = req.header('Authorization');
-
-//   if(!auth) {
-//       next();
-//   } else if (auth.startsWith(prefix)) {
-//       const token = auth.slice(prefix.length);
-  
-//       try {
-//           const { id } = jwt.verify(token, JWT_SECRET);
-
-//           if (id) {
-//               req.user = await getUserById(id);
-//               next();
-//           }
-//       } catch(err) {
-//         next(err);
-//       }
-//   } else {
-//       next({
-//           name: 'AuthorizationHeaderError',
-//           message: `Authorization token must start with ${ prefix }`
-//       });
-//   }
-// });
-
 
 app.use(cors());
 
@@ -57,6 +49,8 @@ app.use('/style.css', express.static(path.join(__dirname, 'style.css')))
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'style.css')));
+
+
 
 app.use('*', (req, res, next) => {
     res.status(404);

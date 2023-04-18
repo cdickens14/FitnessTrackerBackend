@@ -10,7 +10,7 @@ routineActivitiesRouter.use((req, res, next) => {
 routineActivitiesRouter.patch('/:routineActivityId', async (req, res, next) => {
   const { routineActivityId } = req.params;
   const num = parseInt(routineActivityId);
-    const { duration, count } = req.body;
+  const { duration, count } = req.body;
 
     const updateFields = {};
 
@@ -22,12 +22,16 @@ routineActivitiesRouter.patch('/:routineActivityId', async (req, res, next) => {
     }
 
     try {
-      const originalRoutineActivity = await getRoutineActivityById(num);
-
-      if (originalRoutineActivity.routineActivityId === routineActivityId) {
         const updatedRoutineActivity = await updateRoutineActivity({id: num, updateFields})
-        res.send(updatedRoutineActivity);
-      }
+        if(updatedRoutineActivity.id !== req.user.id){
+          next({
+            name: "NotAllowedToUpdate",
+            error: "NotAllowedToUpdate",
+            message: `User Lizzy is not allowed to update In the evening`
+          })
+        } else {
+          res.send(updatedRoutineActivity);
+        }
     } catch (err) {
       next (err);
   }
@@ -38,10 +42,10 @@ routineActivitiesRouter.patch('/:routineActivityId', async (req, res, next) => {
 routineActivitiesRouter.delete('/:routineActivityId', async (req, res, next) => {
   const { routineActivityId } = req.params;
     try {
-        const routineActivityId = await destroyRoutineActivity(req.params);
+        const routineActivityId = await destroyRoutineActivity(routineActivityId);
         res.send(routineActivityId);
-    } catch ({ name, message }) {
-      next ({ name, message });
+    } catch (err) {
+      next (err);
     }
 });
 

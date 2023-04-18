@@ -1,70 +1,49 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import axios from 'axios';
+import Home from './Home';
 
-const Login = (props) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
+const Login = ({ setIsLoggedIn, isLoggedIn }) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [user, setUser] = useState('');
+
+const signIn = async (event) => {
     event.preventDefault();
-  };
-  const signIn = async (token) => {
     try {
-      const response = await fetch(
-        "http://fitnesstrac-kr.herokuapp.com/api/users/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user: {
-              username: `${username}`,
-              password: `${password}`,
-            },
-          }),
-        }
-      );
-      const result = await response.json();
-      console.log(result);
-      props.setIsLoggedIn === true;
-      window.localStorage.setItem("token", `${token}`);
-      return result;
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        const response = await axios.post('/api/users/login', {
+            username,
+            password
+        });
+        const result = await response.data;
+        console.log(result);
+        setUser(response.data)
+        setIsLoggedIn(true);
+        window.localStorage.setItem('token', response.data.token);
+      } catch (err) {
+        console.error(err);
+      }
+    
+}
 
-  const onChange = (event) => {
-    if (event.target.name === "username") {
-      setUsername(event.target.value);
+
+const onChange = (event) => {
+    if (event.target.name === 'username') {
+        setUsername(event.target.value)
     } else {
       setPassword(event.target.value);
     }
-  };
-  return (
-    <React.Fragment>
-      <form id="loginForm" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username"
-          onChange={onChange}
-          value={username}
-          placeholder="Username"
-        ></input>
-        <input
-          type="text"
-          name="password"
-          onChange={onChange}
-          value={password}
-          placeholder="Password"
-        ></input>
-        <button class="button" type="submit" onClick={() => signIn()}>
-          Login
-        </button>
-      </form>
-      {props.isLoggedIn === true ? <Home /> : null}
-    </React.Fragment>
-  );
-};
+    }
+    return (
+        <React.Fragment>
+            <form onSubmit={signIn}>
+                <input type='text' name='username' onChange={onChange} value={username} placeholder='Username'></input>
+                <input type='text' name='password' onChange={onChange} value={password} placeholder='Password'></input>
+                <button type ='submit'>Login</button>
+            </form>
+           
+        </React.Fragment>
+    )
+}
 
 export default Login;
