@@ -19,7 +19,7 @@ const App = () => {
 
   return (
     <React.Fragment>
-      {/* <Header />
+      <Header />
 
       <Routes>
         <Route path="/api" element={<Home isLoggedIn={isLoggedIn} />}></Route>
@@ -48,14 +48,14 @@ const App = () => {
 
       {isLoggedIn === true ? (
         <button onClick={() => logOut()}>Logout</button>
-      ) : null} */}
+      ) : null}
     </React.Fragment>
   );
 };
 
-// const root = createRoot(document.getElementById("root"));
-// root.render(
-//   <HashRouter>
-//     <App />
-//   </HashRouter>
-// );
+const root = createRoot(document.getElementById("root"));
+root.render(
+  <HashRouter>
+    <App />
+  </HashRouter>
+);
