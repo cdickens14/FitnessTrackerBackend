@@ -66,10 +66,19 @@ h1 {
   background-color: rgb(80, 0, 141);
 }
 
+#header {
+  width: 80%;
+  background-color: aqua;
+  display: table;
+}
+
 th {
   background-color: aqua;
 }
 
 td {
-  background-color:bisque;
+  background-color: bisque;
+}
+nav {
+  float: left;
 }
