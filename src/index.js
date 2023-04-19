@@ -22,28 +22,28 @@ const App = () => {
       <Header />
 
       <Routes>
-        <Route path="/api" element={<Home isLoggedIn={isLoggedIn} />}></Route>
+        <Route path="/" element={<Home isLoggedIn={isLoggedIn} />}></Route>
         <Route
-          path="/api/users/register"
+          path="/users/register"
           element={
             <Register setIsLoggedIn={setIsLoggedIn} isLoggedIn={isLoggedIn} />
           }
         ></Route>
         <Route
-          path="/api/users/login"
+          path="/users/login"
           element={
             <Login isLoggedin={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
           }
         ></Route>
         <Route
-          path="/api/activities"
+          path="/activities"
           element={<Activities isLoggedIn={isLoggedIn} />}
         ></Route>
         <Route
-          path="/api/routines"
+          path="/routines"
           element={<Routines isLoggedIn={isLoggedIn} />}
         ></Route>
-        <Route path="/api/users/me" element={<MyRoutines />}></Route>
+        <Route path="/users/me" element={<MyRoutines />}></Route>
       </Routes>
 
       {isLoggedIn === true ? (
